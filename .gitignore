@@ -1,5 +1,22 @@
-node_modules
-.env
+# Node
+node_modules/
 .DS_Store
-scripts/linear.js
-.opencode
+.env
+
+# Svelte Kit
+.svelte-kit/
+build/
+
+# Vite
+dist/
+
+# Tauri
+src-tauri/target/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# OS
+Thumbs.db
