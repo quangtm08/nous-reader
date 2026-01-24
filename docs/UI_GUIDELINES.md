@@ -15,12 +15,12 @@ To achieve the "polished, glassmorphism, high-fidelity" look requested:
 
 Based on the "Classic/Academic" aesthetic of the design references:
 
--   **Headlines (Serif)**: **Newsreader** (Google Font)
-    -   *Usage*: Book titles, "Welcome back" greetings, major section headers.
-    -   *Why*: Variable font, high legibility, beautiful italic styles, fits the "book" vibe perfectly.
--   **UI / Body (Sans-Serif)**: **Inter** (Google Font)
-    -   *Usage*: Navigation, buttons, metadata (progress, dates), small labels.
-    -   *Why*: Clean, neutral, high readability at small sizes.
+-   **Headlines & Book Titles (Serif)**: **Francisco Serial** (Local Font)
+    -   *Usage*: Book titles, "Welcome back" greetings.
+    -   *Why*: Elegant, high-contrast serif that fits the academic/classic vibe.
+-   **UI / Body / Metadata (Sans-Serif)**: **Helvetica**
+    -   *Usage*: Navigation, buttons, author names, metadata (progress, dates), small labels.
+    -   *Why*: Neutral, modern, and high readability.
 
 ## 3. Color Palette (Dark Mode)
 

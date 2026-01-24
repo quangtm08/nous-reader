@@ -1,30 +1,70 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Custom Font Imports (Loading from Google Fonts for now, can be local later) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+/* Francisco Serial (Local Custom Font) */
+@font-face {
+  font-family: 'Francisco Serial';
+  src: url('/fonts/FranciscoSerial-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  /* Base Tailwind Overrides if needed */
-  --bg-primary: #1a1614;
-  --text-primary: #f3f4f6;
+  --bg-primary: #171211;
+  --text-primary: #FDFBF7;
+}
+
+@theme {
+  --font-serif: 'Francisco Serial', serif;
+  --font-sans: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  
+  /* Colors from reference, but with user's preferred gold accent */
+  --color-primary: #e86854; /* Keeping reference primary for potential use, but accent overrides */
+  --color-background-light: #f8f6f6;
+  --color-background-dark: #211311;
+  --color-ivory: #FDFBF7;
+  --color-muted: #9CA3AF;
+  --color-terracotta: #e86854;
+  --color-charcoal: #171211;
+  
+  /* User's preferred accent (Gold) overriding reference's terracotta for main UI elements */
+  --color-accent: #d4b483; 
+  --color-background: #171211; /* Mapping charcoal to background */
+  --color-surface: #211311;    /* Mapping background-dark to surface */
 }
 
 body {
-  @apply bg-background text-gray-100 font-sans antialiased;
-  /* Smooth gradient background as seen in design */
-  background: radial-gradient(circle at 50% 0%, #4a3b32 0%, #1a1614 60%);
-  min-height: 100vh;
+  @apply bg-charcoal text-ivory font-sans antialiased overflow-hidden h-screen w-full relative;
 }
 
-/* Scrollbar Customization */
-::-webkit-scrollbar {
-  width: 8px;
+/* Background Layer System - Preserving the structure but ensuring colors match reference logic */
+.bg-layer-container {
+  @apply absolute inset-0 z-0 pointer-events-none;
 }
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
+
+.bg-base-image {
+  @apply w-full h-full bg-cover bg-center bg-no-repeat blur-2xl scale-110 brightness-[0.9];
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGq522Uk7ot87JX4OBGORKnLSu_vFLbwWI_ngwjE6jbmp2_g-yKQx63Z1c7l4B2-Ll1rquNAmkYEos3OdvZybRv9_PKWDNGexhH03LUqlLjkiKcsnem3CgD0S3HHo-SPinqHkM-sGkAXgc6NKClZmPTjUoDmzavlv9VvI-iXOr2eN_MYtnl2ztJF4V_kJnfxJTK5id01cCUC-b64OyOBSfToY6CKjZWsaD0p37qoSzfPV2vNUjIOfIae-4Mk5l6b8RIZkQcigyQ48');
 }
-::-webkit-scrollbar-thumb {
-  @apply bg-surface rounded-full;
+
+.bg-overlay-1 {
+  @apply absolute inset-0 bg-gradient-to-b from-[#fffaf0]/40 via-[#fff5e6]/10 to-transparent mix-blend-overlay;
+}
+
+.bg-overlay-2 {
+  @apply absolute inset-0 bg-gradient-to-b from-[#ffdbb5]/30 via-transparent to-transparent mix-blend-soft-light;
+}
+
+.bg-overlay-3 {
+  @apply absolute inset-0 bg-gradient-to-t from-[#0f0b0a] via-[#171211]/90 to-transparent;
+}
+
+.bg-texture {
+  @apply absolute inset-0 opacity-[0.06] mix-blend-overlay bg-repeat;
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBDc1izX0uN-9dOTzxkSZCypL9BhCrjTmCOgUk4ULPlPVU6envk_1PnTg7fE-bShYT-ZyDwCigYbcr5uepxNd6z15ij0-4Jxn9G6IUelYj_Ha_yamuSri92A34URGztwhq1ZJHPNS0B6oOLAlv34B3Q_xOaUX_iNm9sulRJZ_mOrfk5982G5ClMQWKtdM7jU2a0DJXgdCC--xbsmTpR1CHhrIumyKhqiPM050MR6p0wr3_eBoSBs9aiLne40DyClv1i9We4hI9m4Y');
+}
+
+.hero-glow {
+  /* Using user's gold accent for the glow as requested */
+  @apply absolute top-1/4 left-1/2 -translate-x-1/2 w-[140%] h-[90%] bg-accent/20 blur-[100px] rounded-full pointer-events-none mix-blend-screen;
 }
