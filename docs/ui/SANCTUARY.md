@@ -16,18 +16,25 @@ The **Sanctuary** is the default landing screen for existing users. It acts as a
 
 ### B. Hero Carousel (Center)
 The core interaction area.
+*   **Layout Strategy**:
+    *   **Grid**: Two columns. Column 1 (Book) is fixed `320px`. Column 2 (Info) is `auto`.
+    *   **Intrinsic Sizing**: The Info column width is strictly determined by the **Bottom Action Row** ("Resume" + "Mark as finished").
+    *   **Wrapping**: The Title and Progress sections are constrained (`w-0 min-w-full`) to wrap perfectly at the edge of the action row.
+    *   **Alignment**: The entire grid has right-padding (`pr-20`) to optically center the active content relative to the side previews.
 *   **3D Book**:
     *   Uses `@threlte/core`.
     *   **Dimensions**: `w-[320px] h-[32rem]` (Desktop).
-    *   **Interaction**: Floats on idle, rotates on hover.
+    *   **Interaction**: Floats on idle (sine wave), rotates on hover, "breathes" (soft scale) on texture swap.
     *   **Glow**: A `hero-glow` div behind the book (`bg-accent/20`, `blur-[100px]`, `mix-blend-screen`).
 *   **Book Info**:
-    *   Located to the right of the book (Desktop) or below (Mobile).
-    *   **Title**: Serif, Bold, `text-5xl`. Drop shadow.
+    *   **Title**: Serif, Bold, `text-5xl`. Drop shadow. Wraps dynamically.
     *   **Author**: Sans, Uppercase, Tracking `0.4em`. **Gold Border Left** (`border-[#d4b483]`).
-    *   **Progress**: Thin `2px` line, gold fill.
+    *   **Progress**: Thin `2px` line, gold fill. Matches the container width.
+    *   **Actions**:
+        *   **Resume**: Large Ivory button, rounded-sm, shadow-xl.
+        *   **Mark as finished**: Subtle text link (`text-base`, `text-ivory/40`), sentence case.
 *   **Navigation**:
-    *   **Previous/Next Placeholders**: Blurred, angled, grayscale, low opacity (`opacity-20`).
+    *   **Previous/Next Placeholders**: Absolutely positioned, blurred, angled, grayscale.
     *   **Controls**: Chevron buttons on far edges.
 
 ### C. Footer (Bottom)
@@ -43,13 +50,18 @@ The Sanctuary relies heavily on the **Background Layer System** defined in `GENE
 *   This creates the "Golden Hour" lighting effect behind the book.
 
 ### Spacing & Proportions
-*   **Gap**: The Book and Info section are tight (`gap-6` to `gap-10`) to feel like a cohesive unit.
+*   **Gap**: The Book and Info section are tight (`gap-6`) to feel like a cohesive unit.
+*   **Carousel Gap**: Wide spacing (`gap-20` or more) between the active unit and side previews.
 *   **Negative Space**: Massive margins on top/bottom/sides to frame the content like a piece of art.
 
 ## 4. Animation Guidelines
-*   **Carousel Transition**:
-    *   When changing books, the 3D scene re-mounts (keyed by ID).
-    *   Text elements should fade in/out (TODO).
-*   **Hover**:
-    *   Adjacent blurred books scale up slightly (`scale-105`) and brighten on hover.
-    *   Resume button icon slides right (`translate-x-1`).
+*   **Text Transition (Grid Stacking)**:
+    *   The "Book Info" container is a 1x1 Grid.
+    *   Entering/Leaving text blocks occupy `col-start-1 row-start-1`.
+    *   This forces them to overlap perfectly during the `crossfade` (800ms, `cubicInOut`), preventing layout jumps.
+*   **Preview Transition (Absolute Stacking)**:
+    *   Side previews use `relative` container + `absolute inset-0` images.
+    *   Transitions use `fade` (800ms).
+*   **3D Book**:
+    *   Texture swaps trigger a soft "breathing" spring animation (`stiffness: 0.03`).
+    *   No scene remounting (persistent Canvas).

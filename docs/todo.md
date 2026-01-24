@@ -8,7 +8,8 @@
 - [x] File System permissions and Dialog setup
 - [x] Basic Library logic: Importing and DB storage
 
-### Phase 2: UI Shell & Design System 🏗️ (CURRENT PRIORITY)
+### Phase 2: UI Shell & Design System 🏗️ (IN PROGRESS)
+- [x] **Sanctuary (Home)**: 3D Carousel, Intrinsic Layout, Smooth Transitions (DONE)
 - [ ] **Desktop Layout**: Implement Sidebar and Main Content area
 - [ ] **Global Styling**: Define color palette (Dark Mode) and typography
 - [ ] **Polished Library**: High-quality Book Cards with hover effects and status indicators
@@ -42,10 +43,11 @@
 ### Important Files
 - `src/lib/db.ts`: Database singleton and schema definitions.
 - `src/lib/library.ts`: Logic for importing and retrieving books.
-- `src/routes/+page.svelte`: Main library dashboard.
+- `src/routes/+page.svelte`: Main library dashboard (Sanctuary).
+- `src/lib/components/Book3D.svelte`: 3D book model with spring animations.
 - `src-tauri/capabilities/default.json`: Security permissions for the app.
 
 ### Known Issues / Technical Debt
 - [ ] **Regex fix**: Path splitting in `library.ts` is basic; might need more robust handling for varied OS paths.
 - [ ] **Metadata**: Currently using filename as title; needs `foliate-js` or `epubjs` to read internal EPUB metadata.
-- [ ] **UI/UX**: Minimal styling; needs a more "polished" feel once core features are in.
+- [ ] **Performance**: 3D Texture swapping is optimized, but large libraries might need virtualization in the future.

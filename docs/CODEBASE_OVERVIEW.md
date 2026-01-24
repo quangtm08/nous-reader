@@ -7,9 +7,10 @@ Desktop e-book reader for EPUB files with AI-assisted annotation features. Impor
 ## Tech Stack
 
 - **Frontend:** SvelteKit 2 + Svelte 5 + TypeScript + Vite
+- **3D Engine:** Three.js + @threlte/core (Svelte wrapper)
 - **Backend:** Tauri 2 (Rust) + SQLite (via `tauri-plugin-sql`)
 - **Key libs:** foliate-js, @tauri-apps/plugin-*, lucide-svelte, zip.js, fflate
-- **Styling:** Custom CSS with dark theme
+- **Styling:** TailwindCSS v4 + Custom CSS variables (Dark Theme)
 
 ## File System
 
@@ -17,12 +18,17 @@ Desktop e-book reader for EPUB files with AI-assisted annotation features. Impor
 nous/
 ├── src/
 │   ├── lib/
-│   │   ├── db.ts                 # Database singleton, migrations, helpers (USE THIS)
+│   │   ├── db.ts                 # Database singleton, migrations, helpers
 │   │   ├── library.ts            # Book import/management
-│   │   └── components/           # Reusable components (empty)
+│   │   ├── mock.ts               # Placeholder data for UI dev
+│   │   ├── stores/               # Svelte stores (e.g., ui.ts)
+│   │   └── components/           # Reusable components
+│   │       ├── Book3D.svelte     # Threlte 3D book model
+│   │       ├── HeroScene.svelte  # 3D Lighting & Camera setup
+│   │       └── Sidebar.svelte    # Main navigation drawer
 │   ├── routes/
 │   │   ├── +layout.svelte        # Root layout (DB init on mount)
-│   │   └── +page.svelte          # Library view
+│   │   └── +page.svelte          # Sanctuary (Home/Library view)
 │   └── app.css                   # Global styles + design tokens
 ├── src-tauri/
 │   ├── src/main.rs               # Entry point
@@ -35,7 +41,7 @@ nous/
 
 1. Tauri launches → loads SvelteKit at `localhost:1420`
 2. Layout mounts → `getDb()` initializes SQLite with migrations
-3. Library page loads → `fetchBooks()` displays imported books
+3. Library page loads → `fetchBooks()` displays imported books (currently using `MOCK_BOOKS` for UI dev)
 4. Import → File dialog → `insertBookRecord()` → refresh
 
 ## Database Schema & Helpers (`src/lib/db.ts`)
@@ -67,8 +73,9 @@ nous/
 - **EPUB:** foliate-js installed but not integrated yet - currently only stores file paths.
 - **No SSR:** Static adapter, all data fetching on client.
 - **Tauri IPC:** No custom commands yet - uses plugins directly from TS.
-- **Components:** `src/lib/components/` is empty - build reusable pieces here.
-- **Styling:** Use design tokens from `app.css` (`--bg-primary`, `--accent`, etc.).
+- **UI Architecture:** 
+    - **Sanctuary (Home):** Uses a persistent 3D Canvas. Do not unmount/remount the Canvas during slide transitions.
+    - **Transitions:** Use `crossfade` (grid-stacking) for text and `absolute` positioning for images to prevent layout shifts.
 
 ## Development
 
