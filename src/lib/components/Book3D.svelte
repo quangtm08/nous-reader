@@ -2,17 +2,36 @@
   import { T } from '@threlte/core';
   import { ContactShadows, Float, HTML } from '@threlte/extras';
   import { spring } from 'svelte/motion';
-  import { TextureLoader, Texture } from 'three';
-  import { useLoader } from '@threlte/core';
+  import { TextureLoader, Texture, SRGBColorSpace } from 'three';
 
   let { coverUrl, thickness = 0.5 } = $props();
 
-  // Load texture (Note: non-reactive here, rely on parent keying if url changes)
-  const texture = useLoader(TextureLoader).load(coverUrl);
+  let texture = $state<Texture | null>(null);
 
-  // Animation springs
-  const scale = spring(1);
-  const rotationY = spring(0);
+  $effect(() => {
+    if (!coverUrl) return;
+    
+    // Animate out (shrink slightly) to indicate change
+    scale.set(0.9);
+
+    const loader = new TextureLoader();
+    loader.load(coverUrl, (t) => {
+      t.colorSpace = SRGBColorSpace;
+      texture = t;
+      // Animate in (restore scale)
+      scale.set(1);
+    });
+  });
+
+  // Animation springs - heavily softened for a 'lazy' luxurious feel
+  const scale = spring(1, {
+    stiffness: 0.03,
+    damping: 0.6
+  });
+  const rotationY = spring(0, {
+    stiffness: 0.03,
+    damping: 0.6
+  });
 
   function onPointerEnter() {
     scale.set(1.1);
@@ -50,8 +69,8 @@
       <!-- 3: Bottom (Pages) -->
       <T.MeshStandardMaterial color="#fdfbf7" />
       <!-- 4: Front (Cover) -->
-      {#if $texture}
-        <T.MeshStandardMaterial map={$texture as Texture} />
+      {#if texture}
+        <T.MeshStandardMaterial map={texture} />
       {:else}
         <T.MeshStandardMaterial color="#333" />
       {/if}

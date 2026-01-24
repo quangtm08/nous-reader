@@ -43,6 +43,8 @@ export const MOCK_BOOKS: Book[] = [
 export const WELCOME_MESSAGES = [
   "Welcome back, Quang",
   "Ready for another chapter?",
-  "The library awaits your return.",
-  "Continue your journey into the classics."
+  "The library awaits.",
+  "Continue your journey.",
+  "Your books wait.",
+  "Time to read."
 ];
