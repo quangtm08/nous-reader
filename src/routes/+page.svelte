@@ -8,6 +8,7 @@
   import { fly, fade } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
   import { confirm } from '@tauri-apps/plugin-dialog';
+  import { goto } from '$app/navigation';
 
   const welcomeMessage = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)];
   
@@ -174,7 +175,10 @@
 
         <!-- Anchor Row: The only element with intrinsic width -->
         <div class="flex items-center gap-8 whitespace-nowrap relative">
-          <button class="bg-ivory text-background hover:bg-white text-base font-bold tracking-wide py-4 px-12 rounded-sm transition-all duration-300 shadow-xl shadow-black/20 hover:shadow-white/20 flex items-center gap-3 group/btn cursor-pointer">
+          <button 
+            onclick={() => goto(`/book/${featuredBook.id}`)}
+            class="bg-ivory text-background hover:bg-white text-base font-bold tracking-wide py-4 px-12 rounded-sm transition-all duration-300 shadow-xl shadow-black/20 hover:shadow-white/20 flex items-center gap-3 group/btn cursor-pointer"
+          >
             <span>Continue reading</span>
             <Play size={20} fill="currentColor" class="group-hover/btn:translate-x-1 transition-transform" />
           </button>

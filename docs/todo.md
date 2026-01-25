@@ -18,8 +18,8 @@
 
 ### Phase 3: The Reading Experience
 - [x] **Metadata Extraction**: Robust EPUB parsing (Title, Author, Cover) using `zip.js` and `DOMParser`. (DONE)
-- [ ] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs (NEXT PRIORITY)
-- [ ] **Book Viewer Route**: Create a dynamic route (`/book/[id]`) to open and read specific books.
+- [x] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs (DONE)
+- [x] **Book Viewer Route**: Create a dynamic route (`/book/[id]`) to open and read specific books. (DONE)
 
 ### Phase 3: Annotations & Recursive Threads 🧪
 - [ ] **Highlighting**: Ability to select text and save CFI ranges
