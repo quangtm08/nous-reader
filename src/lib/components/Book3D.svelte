@@ -75,7 +75,9 @@
     height: 360px;
     transform: translateZ(25px); /* Thickness/2 */
     background-color: #01060f;
-    border-radius: 0 3px 3px 0;
+    /* High-visibility grain texture */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+    border-radius: 0 4px 4px 0;
     box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
     overflow: hidden;
     z-index: 2;
@@ -101,43 +103,33 @@
     position: absolute;
     content: ' ';
     left: 0;
-    top: 4px; /* Inset slightly */
-    width: 46px; /* Reduced to fit better inside cover */
-    height: 352px; /* Height - 8px */
+    top: 4px;
+    width: 46px;
+    height: 352px;
     transform: translateX(216px) rotateY(90deg);
     
-    /* Paper Texture - Reduced aliasing and irregular intervals */
     background-color: #fdfbf7;
     background-image: 
-      /* 1. Irregular horizontal 'cuts' (Masks) to create varied page lengths
-         Using prime numbers and random offsets to break the pattern */
+      /* 1. Page Stack Outlines */
       linear-gradient(to bottom, 
         transparent 0%, 
-        transparent 5%, rgba(253, 251, 247, 0.7) 5%, rgba(253, 251, 247, 0.7) 6%, transparent 6%,
-        transparent 15%, rgba(253, 251, 247, 0.6) 15%, rgba(253, 251, 247, 0.6) 17%, transparent 17%,
-        transparent 23%, rgba(253, 251, 247, 0.7) 23%, rgba(253, 251, 247, 0.7) 23.5%, transparent 23.5%,
-        transparent 38%, rgba(253, 251, 247, 0.6) 38%, rgba(253, 251, 247, 0.6) 39%, transparent 39%,
-        transparent 52%, rgba(253, 251, 247, 0.7) 52%, rgba(253, 251, 247, 0.7) 54%, transparent 54%,
-        transparent 67%, rgba(253, 251, 247, 0.6) 67%, rgba(253, 251, 247, 0.6) 67.5%, transparent 67.5%,
-        transparent 84%, rgba(253, 251, 247, 0.7) 84%, rgba(253, 251, 247, 0.7) 85%, transparent 85%
+        transparent 5%, rgba(0, 0, 0, 0.05) 5.1%, transparent 5.2%
       ),
-      /* 2. Edge shading (Shadows at top/bottom of block) */
-      linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 10%, transparent 90%, rgba(0,0,0,0.05) 100%),
-      /* 3. Side shading (Shadows near covers) */
-      linear-gradient(90deg, rgba(0,0,0,0.12) 0%, transparent 8%, transparent 92%, rgba(0,0,0,0.12) 100%),
-      /* 4. Signatures (The main "chunks" of paper) - Thicker, softer lines to reduce shimmering */
+      /* 2. Ambient Occlusion (Shadow at binding) */
+      linear-gradient(90deg, rgba(0,0,0,0.25) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.1) 100%),
+      /* 3. Signatures (Warm sepia shadows) */
       repeating-linear-gradient(90deg, 
         transparent 0px, 
         transparent 12px, 
-        rgba(0,0,0,0.06) 12px, 
-        rgba(0,0,0,0.06) 13px
+        rgba(101, 67, 33, 0.15) 12px, 
+        rgba(101, 67, 33, 0.15) 13px
       ),
-      /* 5. Base grain - Reduced contrast to prevent Moiré/Flipping illusion */
+      /* 4. Fine Grain */
       repeating-linear-gradient(90deg, 
         transparent 0px, 
         transparent 2px, 
-        rgba(0,0,0,0.04) 2px, 
-        rgba(0,0,0,0.04) 3px
+        rgba(101, 67, 33, 0.08) 2px, 
+        rgba(101, 67, 33, 0.08) 3px
       );
     z-index: 1;
   }
@@ -152,7 +144,8 @@
     height: 360px;
     transform: translateZ(-25px);
     background-color: #01060f;
-    border-radius: 0 3px 3px 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
+    border-radius: 0 4px 4px 0;
     box-shadow: -10px 0 50px 10px rgba(0,0,0,0.5);
   }
 
@@ -161,18 +154,19 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 50px; /* Thickness */
+    width: 50px;
     height: 360px;
     transform: translateX(-25px) rotateY(-90deg);
-    background: #111; /* Darker base */
-    /* Stronger gradient for deep curvature effect */
-    background-image: linear-gradient(90deg, 
-      rgba(255,255,255,0.05) 0%, 
-      rgba(0,0,0,0.4) 15%, 
-      rgba(0,0,0,0.6) 50%,
-      rgba(0,0,0,0.4) 85%,
-      rgba(255,255,255,0.05) 100%
-    );
-    border-radius: 3px 0 0 3px;
+    background: #111;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E"),
+      linear-gradient(90deg, 
+        rgba(255,255,255,0.05) 0%, 
+        rgba(0,0,0,0.4) 15%, 
+        rgba(0,0,0,0.6) 50%,
+        rgba(0,0,0,0.4) 85%,
+        rgba(255,255,255,0.05) 100%
+      );
+    border-radius: 4px 0 0 4px;
   }
 </style>
