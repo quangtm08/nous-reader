@@ -177,10 +177,10 @@
         <div class="flex items-center gap-8 whitespace-nowrap relative">
           <button 
             onclick={() => goto(`/book/${featuredBook.id}`)}
-            class="bg-ivory text-background hover:bg-white text-base font-bold tracking-wide py-4 px-12 rounded-sm transition-all duration-300 shadow-xl shadow-black/20 hover:shadow-white/20 flex items-center gap-3 group/btn cursor-pointer"
+            class="bg-ivory text-background hover:bg-white text-base font-bold tracking-wide py-4 px-12 rounded-sm transition-all duration-600 shadow-xl shadow-black/20 hover:shadow-white/20 flex items-center gap-3 group/btn cursor-pointer"
           >
             <span>Continue reading</span>
-            <Play size={20} fill="currentColor" class="group-hover/btn:translate-x-1 transition-transform" />
+            <Play size={20} fill="currentColor" class="group-hover/btn:translate-x-1 transition-transform duration-600" />
           </button>
           
           <div class="relative">

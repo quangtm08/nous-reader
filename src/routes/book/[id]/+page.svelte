@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { readFile } from '@tauri-apps/plugin-fs';
   import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-svelte';
@@ -15,8 +16,36 @@
   let error: string | null = $state(null);
   let isLoading = $state(true);
 
+  // UI State
+  let showToolbar = $state(false);
+  let showLeftArrow = $state(false);
+  let showRightArrow = $state(false);
+  let leftTimeout: ReturnType<typeof setTimeout>;
+  let rightTimeout: ReturnType<typeof setTimeout>;
+
+  function handleLeftEnter() {
+    clearTimeout(leftTimeout);
+    showLeftArrow = true;
+  }
+
+  function handleLeftLeave() {
+    leftTimeout = setTimeout(() => {
+      showLeftArrow = false;
+    }, 2500);
+  }
+
+  function handleRightEnter() {
+    clearTimeout(rightTimeout);
+    showRightArrow = true;
+  }
+
+  function handleRightLeave() {
+    rightTimeout = setTimeout(() => {
+      showRightArrow = false;
+    }, 2500);
+  }
+
   function goPrev() {
-    // Prefer goLeft/goRight for RTL books when available.
     // @ts-expect-error foliate-js types are partial.
     return view?.goLeft?.() ?? view?.prev();
   }
@@ -30,7 +59,6 @@
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return false;
     const target = e.target as HTMLElement | null;
     if (!target) return true;
-    // Avoid hijacking typing in inputs/textareas.
     if (target.closest('input, textarea, [contenteditable="true"]')) return false;
     return true;
   }
@@ -59,43 +87,33 @@
 
   async function initReader() {
     const foliate: FoliateModule = await import('foliate-js/view.js');
-
     const fileData = await readFile(data.book.local_path);
     const filename = data.book.local_path.split(/[\\/]/).pop() || 'book.epub';
     const file = new File([fileData], filename);
-
     const book = await foliate.makeBook(file);
-
     const nextView = new foliate.View();
     container.appendChild(nextView);
-
     await nextView.open(book);
 
-    // CRITICAL: foliate-js requires `init()` to navigate and render.
-    // `showTextStart` attempts to skip cover/frontmatter when possible.
     try {
       await nextView.init({ showTextStart: true });
     } catch {
       await nextView.init({ showTextStart: false });
     }
 
-    // Improve fixed-layout (cover-heavy) rendering: keep aspect ratio and fit page.
-    // `foliate-fxl` supports a `zoom` attribute.
     // @ts-expect-error foliate-js types are partial.
     if (nextView.isFixedLayout && nextView.renderer) {
       nextView.renderer.setAttribute('zoom', 'fit-page');
     }
 
-    // Prefer focusing the internal view for keyboard navigation.
-    // `foliate-paginator` exposes `focusView()`.
     // @ts-expect-error foliate-js types are partial.
     queueMicrotask(() => nextView.renderer?.focusView?.());
-
     view = nextView;
   }
 
   onMount(() => {
     const controller = new AbortController();
+    if (container) container.focus();
 
     window.addEventListener('keydown', handleKeydown, {
       signal: controller.signal
@@ -110,10 +128,15 @@
         error = `Error opening book: ${message}`;
       } finally {
         isLoading = false;
+        setTimeout(() => container?.focus(), 100);
       }
     })();
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      clearTimeout(leftTimeout);
+      clearTimeout(rightTimeout);
+    };
   });
 
   onDestroy(() => {
@@ -125,24 +148,46 @@
   });
 </script>
 
-<div class="w-screen h-screen bg-[#1a1a1a] text-ivory flex flex-col overflow-hidden">
-  <!-- Toolbar -->
-  <header class="h-12 border-b border-white/10 flex items-center px-4 gap-4 bg-[#211311] shrink-0">
+<div 
+  in:fade={{ duration: 300 }}
+  class="w-screen h-screen bg-[#1a1a1a] text-ivory flex flex-col overflow-hidden relative"
+>
+  <!-- Top Trigger Zone -->
+  <div 
+    onmouseenter={() => showToolbar = true}
+    class="absolute top-0 left-0 right-0 h-4 z-40"
+  ></div>
+
+  <!-- Toolbar (Drop down) -->
+  <header 
+    onmouseenter={() => showToolbar = true}
+    onmouseleave={() => showToolbar = false}
+    class="absolute top-0 left-0 right-0 h-12 border-b border-white/10 flex items-center px-4 gap-4 bg-[#211311] z-50 transition-transform duration-300 ease-in-out shadow-2xl"
+    class:-translate-y-full={!showToolbar}
+    class:translate-y-0={showToolbar}
+  >
     <button 
       onclick={() => goto('/')}
-      class="p-2 hover:bg-white/10 rounded-full transition-colors"
+      class="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
       title="Back to Library"
     >
       <ArrowLeft size={20} />
     </button>
-    <h1 class="font-serif text-lg truncate flex-1">{data.book.title}</h1>
+    <h1 class="font-serif text-lg truncate flex-1 tracking-wide opacity-90">{data.book.title}</h1>
   </header>
 
   <!-- Reader Container -->
-  <main class="flex-1 relative min-h-0" bind:this={container}>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+  <main 
+    class="flex-1 relative min-h-0 bg-[#faf9f6] outline-none"
+    bind:this={container}
+    tabindex="-1"
+    autofocus
+  >
     {#if isLoading}
-      <div class="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
-        <div class="animate-pulse text-gold/60">Loading book...</div>
+      <div transition:fade={{ duration: 200 }} class="absolute inset-0 flex flex-col items-center justify-center bg-[#1a1a1a] z-50">
+        <div class="w-12 h-12 border-2 border-white/10 border-t-accent rounded-full animate-spin mb-4"></div>
+        <div class="font-serif text-ivory/60 tracking-widest text-sm animate-pulse">OPENING BOOK...</div>
       </div>
     {/if}
     
@@ -154,73 +199,61 @@
         </div>
       </div>
     {/if}
-    <!-- Foliate View will be injected here -->
     
-    <!-- Navigation buttons (visible on hover) -->
+    <!-- Hover Zones for Navigation -->
     <button 
       onclick={goPrev}
-      class="nav-button left-2"
+      onmouseenter={handleLeftEnter}
+      onmouseleave={handleLeftLeave}
+      class="absolute left-0 top-0 bottom-0 w-24 z-20 flex items-center justify-start pl-4 cursor-pointer outline-none bg-transparent border-none hover:bg-gradient-to-r from-black/5 to-transparent transition-all duration-300"
       title="Previous page (←)"
       type="button"
+      aria-label="Previous page"
     >
-      <ChevronLeft size={32} />
+      <div 
+        class="transition-all duration-500 ease-in-out text-black/40 transform"
+        class:opacity-100={showLeftArrow}
+        class:opacity-0={!showLeftArrow}
+        class:-translate-x-2={!showLeftArrow}
+        class:translate-x-0={showLeftArrow}
+      >
+        <ChevronLeft size={48} strokeWidth={1} />
+      </div>
     </button>
+
     <button 
       onclick={goNext}
-      class="nav-button right-2"
+      onmouseenter={handleRightEnter}
+      onmouseleave={handleRightLeave}
+      class="absolute right-0 top-0 bottom-0 w-24 z-20 flex items-center justify-end pr-4 cursor-pointer outline-none bg-transparent border-none hover:bg-gradient-to-l from-black/5 to-transparent transition-all duration-300"
       title="Next page (→)"
       type="button"
+      aria-label="Next page"
     >
-      <ChevronRight size={32} />
+      <div 
+        class="transition-all duration-500 ease-in-out text-black/40 transform"
+        class:opacity-100={showRightArrow}
+        class:opacity-0={!showRightArrow}
+        class:translate-x-2={!showRightArrow}
+        class:translate-x-0={showRightArrow}
+      >
+        <ChevronRight size={48} strokeWidth={1} />
+      </div>
     </button>
   </main>
 </div>
 
 <style>
-  /* Foliate view custom element needs explicit sizing */
   :global(foliate-view) {
     display: block;
     width: 100%;
     height: 100%;
     background-color: #faf9f6;
   }
-
-  /* Ensure the renderer fills available space */
   :global(foliate-paginator),
   :global(foliate-fxl) {
     display: block;
     width: 100%;
     height: 100%;
-  }
-
-  /* Navigation buttons */
-  .nav-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-    padding: 1rem 0.5rem;
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .nav-button:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
-
-  main:hover .nav-button {
-    opacity: 1;
-  }
-
-  /* Also show on focus for accessibility */
-  .nav-button:focus {
-    opacity: 1;
-    outline: 2px solid rgba(212, 180, 131, 0.5);
-    outline-offset: 2px;
   }
 </style>
