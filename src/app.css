@@ -67,5 +67,5 @@ body {
 
 .hero-glow {
   /* Using user's gold accent for the glow as requested */
-  @apply absolute top-1/4 left-1/2 -translate-x-1/2 w-[140%] h-[90%] bg-accent/20 blur-[100px] rounded-full pointer-events-none mix-blend-screen;
+  @apply absolute top-[15%] left-1/2 -translate-x-1/2 w-[140%] h-[90%] bg-accent/20 blur-[100px] rounded-full pointer-events-none mix-blend-screen;
 }

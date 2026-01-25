@@ -43,7 +43,7 @@
   }
 
   .book-float {
-    animation: float 6s ease-in-out infinite;
+    animation: float 6.5s ease-in-out infinite;
   }
 
   @keyframes initAnimation {
@@ -57,8 +57,8 @@
     position: relative;
     transform-style: preserve-3d;
     transform: rotateY(-22deg); /* Match animation end */
-    transition: 1.6s cubic-bezier(0.23, 1, 0.32, 1);
-    animation: 0.78s ease 0s 1 initAnimation;
+    transition: 2s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: 0.98s ease 0s 1 initAnimation;
   }
 
   .book-container:hover .book, 

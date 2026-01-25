@@ -9,6 +9,42 @@
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">
+    <div id="initial-loader">
+      <div class="spinner"></div>
+    </div>
+
+    <style>
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        background: #171211;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.6s ease-out, visibility 0.6s;
+      }
+
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid rgba(212, 180, 131, 0.2);
+        border-top-color: #d4b483;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      body.loaded #initial-loader {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    </style>
+
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

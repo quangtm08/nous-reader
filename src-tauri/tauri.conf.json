@@ -12,10 +12,12 @@
   "app": {
     "windows": [
       {
-        "title": "tauri-app",
+        "label": "main",
+        "title": "Nous",
         "width": 1440,
         "height": 900,
-        "fullscreen": true
+        "fullscreen": true,
+        "visible": false
       }
     ],
     "security": {

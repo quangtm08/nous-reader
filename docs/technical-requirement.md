@@ -108,5 +108,3 @@ The database must support an **Adjacency List** model to allow for the future "R
 > "Initialize a Tauri v2 project with Svelte. Integrate `foliate-js` using `zip.js` and `fflate`. Create a command to load a local EPUB file and a listener that captures 'selection' events. When text is selected, save the `highlighted_text` and `cfi_range` into a local SQLite table named `annotations` using the `tauri-plugin-sql` plugin."
 
 ---
-
-**Would you like me to create the first set of boilerplate files for the Rust backend and the Svelte frontend to get this started?**
