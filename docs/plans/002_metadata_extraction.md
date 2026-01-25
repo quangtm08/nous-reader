@@ -51,7 +51,7 @@ Modify the import flow to read the file before saving.
 
 ## 4. Verification
 
-- [ ] Import a known EPUB (e.g., "Moby Dick").
-- [ ] Check DB: `title` should be "Moby Dick" (not "moby-dick.epub").
-- [ ] Check DB: `author` should be "Herman Melville".
-- [ ] Check UI: The Home screen should display the real book cover art.
+- [x] Import a known EPUB (e.g., "Moby Dick").
+- [x] Check DB: `title` should be "Moby Dick" (not "moby-dick.epub").
+- [x] Check DB: `author` should be "Herman Melville".
+- [x] Check UI: The Home screen should display the real book cover art.

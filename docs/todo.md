@@ -10,16 +10,16 @@
 - [x] **Connect DB to UI**: Home screen now reads from real database (with MOCK fallback)
 
 ### Phase 2: UI Shell & Design System 🏗️ (IN PROGRESS)
-- [x] **Sanctuary (Home)**: 3D Carousel, Intrinsic Layout, Smooth Transitions (DONE)
-- [ ] **Desktop Layout**: Implement Sidebar and Main Content area
-- [ ] **Global Styling**: Define color palette (Dark Mode) and typography
-- [ ] **Polished Library**: High-quality Book Cards with hover effects and status indicators
-- [ ] **Component Library**: Create reusable buttons, inputs, and icons
+- [x] **Sanctuary (Home)**: High-fidelity CSS-based 3D Carousel with realistic textures, organic floating animations, and keyboard navigation. (DONE)
+- [x] **Desktop Layout**: Implemented Sidebar and Main Content structure with unified background layer system. (DONE)
+- [ ] **Global Styling**: Refine design tokens and typography (currently using Francisco Serial).
+- [ ] **Polished Library**: High-quality Book Cards for the "All Books" view (currently focusing on Sanctuary).
+- [ ] **Component Library**: Create reusable buttons, inputs, and icons.
 
 ### Phase 3: The Reading Experience
-- [x] **Metadata Extraction**: Parse EPUBs for real covers and titles (DONE)
+- [x] **Metadata Extraction**: Robust EPUB parsing (Title, Author, Cover) using `zip.js` and `DOMParser`. (DONE)
 - [ ] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs (NEXT PRIORITY)
-- [ ] **Book Viewer Route**: Create a dynamic route to open specific books
+- [ ] **Book Viewer Route**: Create a dynamic route (`/book/[id]`) to open and read specific books.
 
 ### Phase 3: Annotations & Recursive Threads 🧪
 - [ ] **Highlighting**: Ability to select text and save CFI ranges
