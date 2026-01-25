@@ -1,21 +1,11 @@
 import { open } from '@tauri-apps/plugin-dialog';
-import { getDb } from './db';
-
-export interface Book {
-  id: string;
-  title: string;
-  author?: string;
-  local_path: string;
-  cover_blob?: Uint8Array;
-  metadata?: string; // JSON string
-}
+import { insertBookRecord, type BookRecord } from './db';
 
 /**
  * Opens a system dialog to select an EPUB file and adds it to the library.
- * Currently uses the filename as the title.
- * @returns {Promise<Book | null>} The imported book object or null if cancelled.
+ * @returns {Promise<BookRecord | null>} The imported book object or null if cancelled.
  */
-export async function importBook(): Promise<Book | null> {
+export async function importBook(): Promise<BookRecord | null> {
   const selected = await open({
     multiple: false,
     filters: [{
@@ -29,28 +19,15 @@ export async function importBook(): Promise<Book | null> {
   const path = selected;
   
   // TODO: Extract actual metadata from the EPUB file using foliate-js later.
-  // For now, fall back to the filename.
-  const filename = path.split(/[/\\]/).pop() || 'Unknown Book'; // Handle both / and \ paths
-  const id = crypto.randomUUID();
-
-  const db = await getDb();
-  await db.execute(
-    'INSERT INTO books (id, title, local_path) VALUES (?, ?, ?)',
-    [id, filename, path]
-  );
-
-  return {
-    id,
+  const filename = path.split(/[/\\]/).pop()?.replace(/\.epub$/i, '') || 'Unknown Book';
+  
+  return await insertBookRecord({
     title: filename,
     local_path: path
-  };
+  });
 }
 
 /**
  * Retrieves all books from the library.
- * @returns {Promise<Book[]>} List of books.
+ * MOVED: Use fetchBooks() from db.ts directly.
  */
-export async function getBooks(): Promise<Book[]> {
-  const db = await getDb();
-  return await db.select<Book[]>('SELECT * FROM books');
-}

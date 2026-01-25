@@ -1,9 +1,15 @@
 <script lang="ts">
   import { Library, BookOpen, Settings, Search, PlusCircle, X } from 'lucide-svelte';
   import { isSidebarOpen } from '$lib/stores/ui';
+  import { libraryStore } from '$lib/stores/library';
   
   function close() {
     isSidebarOpen.set(false);
+  }
+
+  async function handleImport() {
+    await libraryStore.addBook();
+    close();
   }
 </script>
 
@@ -49,7 +55,10 @@
   </nav>
 
   <div class="p-4 mt-auto border-t border-white/5 space-y-2">
-    <button class="w-full flex items-center space-x-3 p-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all cursor-pointer">
+    <button 
+      onclick={handleImport}
+      class="w-full flex items-center space-x-3 p-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all cursor-pointer"
+    >
       <PlusCircle size={20} />
       <span class="font-medium">Import</span>
     </button>

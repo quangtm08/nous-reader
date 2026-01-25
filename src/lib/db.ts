@@ -107,6 +107,8 @@ const MIGRATIONS: Migration[] = [
   }
 ];
 
+// ... (rest of file)
+
 let dbInstance: SQLiteDatabase | null = null;
 let initPromise: Promise<SQLiteDatabase> | null = null;
 

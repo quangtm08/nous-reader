@@ -1,31 +1,47 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { MOCK_BOOKS, WELCOME_MESSAGES } from '$lib/mock';
-  import { Search, Menu, ChevronLeft, ChevronRight, Play } from 'lucide-svelte';
+  import { Search, Menu, ChevronLeft, ChevronRight, Play, Plus } from 'lucide-svelte';
   import { Canvas } from '@threlte/core';
   import HeroScene from '$lib/components/HeroScene.svelte';
   import { isSidebarOpen } from '$lib/stores/ui';
+  import { libraryStore } from '$lib/stores/library';
   import { fly, fade } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
 
   const welcomeMessage = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)];
   
   let currentIndex = $state(0);
-  let featuredBook = $derived(MOCK_BOOKS[currentIndex]);
+  
+  // Use real books if available, otherwise fallback to mock for demo feel
+  let books = $derived($libraryStore.books.length > 0 ? $libraryStore.books : MOCK_BOOKS);
+  let featuredBook = $derived(books[currentIndex]);
   let direction = $state(1); // 1 = slide right (next), -1 = slide left (prev)
 
   // Helper to get previous/next books with wrap-around logic
-  let prevBook = $derived(MOCK_BOOKS[(currentIndex - 1 + MOCK_BOOKS.length) % MOCK_BOOKS.length]);
-  let nextBook = $derived(MOCK_BOOKS[(currentIndex + 1) % MOCK_BOOKS.length]);
+  let prevBook = $derived(books[(currentIndex - 1 + books.length) % books.length]);
+  let nextBook = $derived(books[(currentIndex + 1) % books.length]);
 
   function next() {
     direction = 1;
-    currentIndex = (currentIndex + 1) % MOCK_BOOKS.length;
+    currentIndex = (currentIndex + 1) % books.length;
   }
 
   function prev() {
     direction = -1;
-    currentIndex = (currentIndex - 1 + MOCK_BOOKS.length) % MOCK_BOOKS.length;
+    currentIndex = (currentIndex - 1 + books.length) % books.length;
   }
+
+  // Ensure currentIndex is valid when books array changes (e.g. Mock -> Real)
+  $effect(() => {
+    if (currentIndex >= books.length) {
+      currentIndex = 0;
+    }
+  });
+
+  onMount(() => {
+    libraryStore.loadLibrary();
+  });
 </script>
 
 <div class="min-h-screen flex flex-col p-8 md:p-12 max-w-[1600px] mx-auto relative">
@@ -79,7 +95,7 @@
           out:fade={{ duration: 800, easing: cubicInOut }}
           class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-all duration-500 transform hover:scale-105 hover:opacity-30"
         >
-          <img src={prevBook.coverUrl} alt="Previous" class="w-full h-full object-cover rounded-sm shadow-2xl" />
+          <img src={prevBook.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Previous" class="w-full h-full object-cover rounded-sm shadow-2xl" />
         </div>
       {/key}
     </div>
@@ -91,7 +107,7 @@
         <div class="hero-glow"></div>
         <div class="relative w-52 md:w-[320px] h-[22rem] md:h-[32rem]">
           <Canvas>
-            <HeroScene coverUrl={featuredBook.coverUrl} />
+            <HeroScene coverUrl={featuredBook.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} />
           </Canvas>
         </div>
       </div>
@@ -111,7 +127,7 @@
               </h2>
               <!-- Explicit border color and opacity to fix visibility issue -->
               <p class="text-[10px] md:text-xs font-sans uppercase tracking-[0.4em] text-ivory/80 mb-8 border-l-2 border-[#d4b483] pl-4">
-                {featuredBook.author}
+                {featuredBook.author || 'Unknown Author'}
               </p>
 
               <div class="w-full mb-8">
@@ -123,7 +139,7 @@
                   <div class="h-full bg-ivory shadow-[0_0_15px_rgba(255,255,255,0.5)] transition-all duration-1000" style="width: {featuredBook.progress}%"></div>
                 </div>
                 <p class="mt-2 text-[10px] text-ivory/60 tracking-wide">
-                  {featuredBook.timeRemaining} remaining
+                  {featuredBook.timeRemaining}
                 </p>
               </div>
             </div>
@@ -151,7 +167,7 @@
           out:fade={{ duration: 800, easing: cubicInOut }}
           class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-all duration-500 transform hover:scale-105 hover:opacity-30"
         >
-          <img src={nextBook.coverUrl} alt="Next" class="w-full h-full object-cover rounded-sm shadow-2xl" />
+          <img src={nextBook.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Next" class="w-full h-full object-cover rounded-sm shadow-2xl" />
         </div>
       {/key}
     </div>
@@ -164,7 +180,7 @@
 
   <!-- Slider Dots (Footer) -->
   <footer class="relative z-20 w-full py-8 flex justify-center items-center gap-4">
-    {#each MOCK_BOOKS as _, i}
+    {#each books as _, i}
       <button 
         onclick={() => currentIndex = i}
         class="rounded-full transition-all duration-300 {i === currentIndex ? 'size-2 bg-ivory shadow-[0_0_10px_rgba(255,255,255,0.8)] scale-150' : 'size-1.5 bg-ivory/30 hover:bg-ivory/50 cursor-pointer'}"
