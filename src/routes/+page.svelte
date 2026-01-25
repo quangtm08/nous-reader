@@ -1,17 +1,19 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { MOCK_BOOKS, WELCOME_MESSAGES } from '$lib/mock';
-  import { Search, Menu, ChevronLeft, ChevronRight, Play, Plus } from 'lucide-svelte';
+  import { Search, Menu, ChevronLeft, ChevronRight, Play, Plus, Ellipsis, Trash2, CheckCircle2 } from 'lucide-svelte';
   import { Canvas } from '@threlte/core';
   import HeroScene from '$lib/components/HeroScene.svelte';
   import { isSidebarOpen } from '$lib/stores/ui';
   import { libraryStore } from '$lib/stores/library';
   import { fly, fade } from 'svelte/transition';
   import { cubicInOut } from 'svelte/easing';
+  import { confirm } from '@tauri-apps/plugin-dialog';
 
   const welcomeMessage = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)];
   
   let currentIndex = $state(0);
+  let isMenuOpen = $state(false);
   
   // Use real books if available, otherwise fallback to mock for demo feel
   let books = $derived($libraryStore.books.length > 0 ? $libraryStore.books : MOCK_BOOKS);
@@ -25,17 +27,19 @@
   function next() {
     direction = 1;
     currentIndex = (currentIndex + 1) % books.length;
+    isMenuOpen = false;
   }
 
   function prev() {
     direction = -1;
     currentIndex = (currentIndex - 1 + books.length) % books.length;
+    isMenuOpen = false;
   }
 
   // Ensure currentIndex is valid when books array changes (e.g. Mock -> Real)
   $effect(() => {
     if (currentIndex >= books.length) {
-      currentIndex = 0;
+      currentIndex = Math.max(0, books.length - 1);
     }
   });
 
@@ -145,14 +149,57 @@
             </div>
 
             <!-- Anchor Row: The only element with intrinsic width -->
-            <div class="flex items-center gap-8 whitespace-nowrap">
-              <button class="bg-ivory text-background hover:bg-white text-base font-bold tracking-wide py-4 px-10 rounded-sm transition-all duration-300 shadow-xl shadow-black/20 hover:shadow-white/20 flex items-center gap-3 group/btn cursor-pointer">
-                <span>Resume</span>
+            <div class="flex items-center gap-8 whitespace-nowrap relative">
+              <button class="bg-ivory text-background hover:bg-white text-base font-bold tracking-wide py-4 px-12 rounded-sm transition-all duration-300 shadow-xl shadow-black/20 hover:shadow-white/20 flex items-center gap-3 group/btn cursor-pointer">
+                <span>Continue reading</span>
                 <Play size={20} fill="currentColor" class="group-hover/btn:translate-x-1 transition-transform" />
               </button>
-              <span class="text-base tracking-wide text-ivory/40 hover:text-ivory/80 transition-colors cursor-pointer font-normal">
-                Mark as finished
-              </span>
+              
+              <div class="relative">
+                <button 
+                  onclick={() => isMenuOpen = !isMenuOpen}
+                  class="size-10 flex items-center justify-center rounded-full text-ivory/40 hover:text-ivory hover:bg-white/5 transition-all cursor-pointer"
+                  aria-label="Book options"
+                >
+                  <Ellipsis size={24} />
+                </button>
+                
+                {#if isMenuOpen}
+                  <div 
+                    transition:fade={{ duration: 150 }}
+                    class="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-[#211311] border border-white/10 rounded-lg shadow-2xl py-2 min-w-[200px] z-50 overflow-hidden backdrop-blur-xl"
+                  >
+                    <button 
+                      class="w-full text-left px-4 py-3 text-sm text-ivory/80 hover:bg-white/5 hover:text-ivory transition-colors flex items-center gap-3 cursor-pointer"
+                      onclick={() => {
+                        // TODO: Implement mark as finished
+                        isMenuOpen = false;
+                      }}
+                    >
+                      <CheckCircle2 size={16} class="text-accent" />
+                      Mark as finished
+                    </button>
+                    <div class="h-px bg-white/5 mx-2 my-1"></div>
+                    <button 
+                      class="w-full text-left px-4 py-3 text-sm text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-colors flex items-center gap-3 cursor-pointer"
+                      onclick={async () => {
+                        const confirmed = await confirm('Are you sure you want to delete this book?', {
+                          title: 'Delete Book',
+                          kind: 'warning'
+                        });
+                        
+                        if (confirmed) {
+                          libraryStore.removeBook(featuredBook.id);
+                        }
+                        isMenuOpen = false;
+                      }}
+                    >
+                      <Trash2 size={16} />
+                      Delete Book
+                    </button>
+                  </div>
+                {/if}
+              </div>
             </div>
           </div>
         {/key}

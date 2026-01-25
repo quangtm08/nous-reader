@@ -290,3 +290,8 @@ export async function fetchThreadsForAnnotation(annotationId: string): Promise<T
     [annotationId]
   );
 }
+
+export async function deleteBook(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM books WHERE id = ?`, [id]);
+}

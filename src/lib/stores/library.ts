@@ -62,6 +62,16 @@ function createLibraryStore() {
         console.error('❌ Import failed:', e); // Debug log
         update(s => ({ ...s, error: e instanceof Error ? e.message : 'Import failed' }));
       }
+    },
+    removeBook: async (id: string) => {
+      try {
+        const { deleteBook } = await import('../db');
+        await deleteBook(id);
+        await libraryStore.loadLibrary();
+      } catch (e) {
+        console.error('❌ Delete failed:', e);
+        update(s => ({ ...s, error: e instanceof Error ? e.message : 'Delete failed' }));
+      }
     }
   };
 }

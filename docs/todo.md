@@ -7,6 +7,7 @@
 - [x] SQLite Database integration and schema design
 - [x] File System permissions and Dialog setup
 - [x] Basic Library logic: Importing and DB storage
+- [x] **Connect DB to UI**: Home screen now reads from real database (with MOCK fallback)
 
 ### Phase 2: UI Shell & Design System 🏗️ (IN PROGRESS)
 - [x] **Sanctuary (Home)**: 3D Carousel, Intrinsic Layout, Smooth Transitions (DONE)
@@ -16,8 +17,8 @@
 - [ ] **Component Library**: Create reusable buttons, inputs, and icons
 
 ### Phase 3: The Reading Experience
+- [ ] **Metadata Extraction**: Parse EPUBs for real covers and titles (NEXT PRIORITY)
 - [ ] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs
-- [ ] **Metadata Extraction**: Parse EPUBs for real covers and titles
 - [ ] **Book Viewer Route**: Create a dynamic route to open specific books
 
 ### Phase 3: Annotations & Recursive Threads 🧪
@@ -43,6 +44,7 @@
 ### Important Files
 - `src/lib/db.ts`: Database singleton and schema definitions.
 - `src/lib/library.ts`: Logic for importing and retrieving books.
+- `src/lib/stores/library.ts`: Reactive store for managing book state.
 - `src/routes/+page.svelte`: Main library dashboard (Sanctuary).
 - `src/lib/components/Book3D.svelte`: 3D book model with spring animations.
 - `src-tauri/capabilities/default.json`: Security permissions for the app.
