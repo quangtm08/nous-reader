@@ -1,5 +1,6 @@
-# Execution Plan: EPUB Metadata Extraction
+# Execution Plan: EPUB Metadata Extraction (COMPLETED)
 
+**Status:** ✅ Completed on 2026-01-25
 **Goal:** Implement real parsing of EPUB files during import to extract the **Title**, **Author**, and **Cover Image**. This replaces the current filename-based fallback and provides a rich UI experience.
 
 ## 1. Prerequisites & Dependencies

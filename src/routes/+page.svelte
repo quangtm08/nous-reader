@@ -2,8 +2,7 @@
   import { onMount } from 'svelte';
   import { MOCK_BOOKS, WELCOME_MESSAGES } from '$lib/mock';
   import { Search, Menu, ChevronLeft, ChevronRight, Play, Plus, Ellipsis, Trash2, CheckCircle2 } from 'lucide-svelte';
-  import { Canvas } from '@threlte/core';
-  import HeroScene from '$lib/components/HeroScene.svelte';
+  import Book3D from '$lib/components/Book3D.svelte';
   import { isSidebarOpen } from '$lib/stores/ui';
   import { libraryStore } from '$lib/stores/library';
   import { fly, fade } from 'svelte/transition';
@@ -17,12 +16,12 @@
   
   // Use real books if available, otherwise fallback to mock for demo feel
   let books = $derived($libraryStore.books.length > 0 ? $libraryStore.books : MOCK_BOOKS);
-  let featuredBook = $derived(books[currentIndex]);
+  let featuredBook = $derived(books[currentIndex] ?? books[0]); // Safe fallback
   let direction = $state(1); // 1 = slide right (next), -1 = slide left (prev)
 
   // Helper to get previous/next books with wrap-around logic
-  let prevBook = $derived(books[(currentIndex - 1 + books.length) % books.length]);
-  let nextBook = $derived(books[(currentIndex + 1) % books.length]);
+  let prevBook = $derived(books[(currentIndex - 1 + books.length) % books.length] ?? featuredBook);
+  let nextBook = $derived(books[(currentIndex + 1) % books.length] ?? featuredBook);
 
   function next() {
     direction = 1;
@@ -86,6 +85,7 @@
 
   <!-- Hero Section (Book Slider) -->
   <section class="flex-1 relative flex items-center justify-center gap-12 md:gap-20 py-4 pt-20">
+    {#if featuredBook}
     <!-- Left Navigation -->
     <button onclick={prev} class="hidden md:flex absolute left-0 z-30 size-12 items-center justify-center rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md text-ivory/60 hover:text-ivory transition-all border border-white/5 shadow-lg cursor-pointer">
       <ChevronLeft size={24} strokeWidth={1.5} />
@@ -93,26 +93,35 @@
 
     <!-- Adjacent Book Placeholder (Left) -->
     <div class="hidden xl:block relative w-32 h-52 rotate-[-5deg]">
-      {#key prevBook.id}
+      {#key prevBook?.id}
         <div 
           in:fade={{ duration: 800, easing: cubicInOut }}
           out:fade={{ duration: 800, easing: cubicInOut }}
           class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-all duration-500 transform hover:scale-105 hover:opacity-30"
         >
-          <img src={prevBook.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Previous" class="w-full h-full object-cover rounded-sm shadow-2xl" />
+          <img src={prevBook?.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Previous" class="w-full h-full object-cover rounded-sm shadow-2xl" />
         </div>
       {/key}
     </div>
 
     <!-- Active Book (Featured) -->
-    <div class="grid grid-cols-1 md:grid-cols-[320px_auto] items-center gap-8 md:gap-6 z-20 justify-center pr-0 md:pr-20">
-      <!-- 3D Book Scene -->
-      <div class="relative group perspective-1000 flex justify-center md:justify-end">
+    <div class="grid grid-cols-1 md:grid-cols-[240px_auto] items-center gap-8 md:gap-16 z-20 justify-center pl-0 md:pl-10 pr-0 md:pr-6">
+      <div class="relative group flex justify-center md:justify-end">
         <div class="hero-glow"></div>
-        <div class="relative w-52 md:w-[320px] h-[22rem] md:h-[32rem]">
-          <Canvas>
-            <HeroScene coverUrl={featuredBook.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} />
-          </Canvas>
+        <!-- 1x1 Grid for stacking transitions -->
+        <div class="grid grid-cols-1 grid-rows-1 relative items-center justify-center w-full h-[400px]">
+          {#key featuredBook.id}
+            <div 
+              in:fade={{ duration: 800, easing: cubicInOut }}
+              out:fade={{ duration: 800, easing: cubicInOut }}
+              class="col-start-1 row-start-1"
+            >
+              <Book3D 
+                coverUrl={featuredBook.coverUrl} 
+                title={featuredBook.title} 
+              />
+            </div>
+          {/key}
         </div>
       </div>
 
@@ -208,13 +217,13 @@
 
     <!-- Adjacent Book Placeholder (Right) -->
     <div class="hidden xl:block relative w-32 h-52 rotate-[5deg]">
-      {#key nextBook.id}
+      {#key nextBook?.id}
         <div 
           in:fade={{ duration: 800, easing: cubicInOut }}
           out:fade={{ duration: 800, easing: cubicInOut }}
           class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-all duration-500 transform hover:scale-105 hover:opacity-30"
         >
-          <img src={nextBook.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Next" class="w-full h-full object-cover rounded-sm shadow-2xl" />
+          <img src={nextBook?.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Next" class="w-full h-full object-cover rounded-sm shadow-2xl" />
         </div>
       {/key}
     </div>
@@ -223,6 +232,7 @@
     <button onclick={next} class="hidden md:flex absolute right-0 z-30 size-12 items-center justify-center rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md text-ivory/60 hover:text-ivory transition-all border border-white/5 shadow-lg cursor-pointer">
       <ChevronRight size={24} strokeWidth={1.5} />
     </button>
+    {/if}
   </section>
 
   <!-- Slider Dots (Footer) -->

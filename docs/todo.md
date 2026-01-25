@@ -17,8 +17,8 @@
 - [ ] **Component Library**: Create reusable buttons, inputs, and icons
 
 ### Phase 3: The Reading Experience
-- [ ] **Metadata Extraction**: Parse EPUBs for real covers and titles (NEXT PRIORITY)
-- [ ] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs
+- [x] **Metadata Extraction**: Parse EPUBs for real covers and titles (DONE)
+- [ ] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs (NEXT PRIORITY)
 - [ ] **Book Viewer Route**: Create a dynamic route to open specific books
 
 ### Phase 3: Annotations & Recursive Threads 🧪
@@ -44,6 +44,7 @@
 ### Important Files
 - `src/lib/db.ts`: Database singleton and schema definitions.
 - `src/lib/library.ts`: Logic for importing and retrieving books.
+- `src/lib/metadata.ts`: EPUB parser (Title, Author, Cover Extraction).
 - `src/lib/stores/library.ts`: Reactive store for managing book state.
 - `src/routes/+page.svelte`: Main library dashboard (Sanctuary).
 - `src/lib/components/Book3D.svelte`: 3D book model with spring animations.
@@ -51,5 +52,4 @@
 
 ### Known Issues / Technical Debt
 - [ ] **Regex fix**: Path splitting in `library.ts` is basic; might need more robust handling for varied OS paths.
-- [ ] **Metadata**: Currently using filename as title; needs `foliate-js` or `epubjs` to read internal EPUB metadata.
 - [ ] **Performance**: 3D Texture swapping is optimized, but large libraries might need virtualization in the future.

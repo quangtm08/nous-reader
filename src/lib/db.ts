@@ -7,6 +7,10 @@ export interface BookRecord {
   title: string;
   author: string | null;
   local_path: string;
+  /** 
+   * BLOB from SQLite - tauri-plugin-sql returns this as number[] (byte array).
+   * Use blobToUint8Array() in stores/library.ts to safely convert.
+   */
   cover_blob: number[] | null;
   metadata: string | null;
   created_at: string;
