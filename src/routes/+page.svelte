@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { MOCK_BOOKS, WELCOME_MESSAGES } from '$lib/mock';
+  import { WELCOME_MESSAGES } from '$lib/mock';
   import { Search, Menu, ChevronLeft, ChevronRight, Play, Plus, Ellipsis, Trash2, CheckCircle2 } from 'lucide-svelte';
   import Book3D from '$lib/components/Book3D.svelte';
   import { isSidebarOpen } from '$lib/stores/ui';
@@ -14,9 +14,9 @@
   let currentIndex = $state(0);
   let isMenuOpen = $state(false);
   
-  // Use real books if available, otherwise fallback to mock for demo feel
-  let books = $derived($libraryStore.books.length > 0 ? $libraryStore.books : MOCK_BOOKS);
-  let featuredBook = $derived(books[currentIndex] ?? books[0]); // Safe fallback
+  // Use real books from the library store
+  let books = $derived($libraryStore.books);
+  let featuredBook = $derived(books[currentIndex]); 
   let direction = $state(1); // 1 = slide right (next), -1 = slide left (prev)
   let isNavigating = false; // Debounce flag
 
