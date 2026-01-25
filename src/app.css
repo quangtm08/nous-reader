@@ -43,7 +43,7 @@ body {
 }
 
 .bg-base-image {
-  @apply w-full h-full bg-cover bg-center bg-no-repeat blur-2xl scale-110 brightness-[0.9];
+  @apply w-full h-full bg-cover bg-center bg-no-repeat blur-xl scale-105 brightness-[0.95];
   background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAGq522Uk7ot87JX4OBGORKnLSu_vFLbwWI_ngwjE6jbmp2_g-yKQx63Z1c7l4B2-Ll1rquNAmkYEos3OdvZybRv9_PKWDNGexhH03LUqlLjkiKcsnem3CgD0S3HHo-SPinqHkM-sGkAXgc6NKClZmPTjUoDmzavlv9VvI-iXOr2eN_MYtnl2ztJF4V_kJnfxJTK5id01cCUC-b64OyOBSfToY6CKjZWsaD0p37qoSzfPV2vNUjIOfIae-4Mk5l6b8RIZkQcigyQ48');
 }
 
@@ -60,8 +60,9 @@ body {
 }
 
 .bg-texture {
-  @apply absolute inset-0 opacity-[0.06] mix-blend-overlay bg-repeat;
-  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDBDc1izX0uN-9dOTzxkSZCypL9BhCrjTmCOgUk4ULPlPVU6envk_1PnTg7fE-bShYT-ZyDwCigYbcr5uepxNd6z15ij0-4Jxn9G6IUelYj_Ha_yamuSri92A34URGztwhq1ZJHPNS0B6oOLAlv34B3Q_xOaUX_iNm9sulRJZ_mOrfk5982G5ClMQWKtdM7jU2a0DJXgdCC--xbsmTpR1CHhrIumyKhqiPM050MR6p0wr3_eBoSBs9aiLne40DyClv1i9We4hI9m4Y');
+  @apply absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none;
+  /* Replaced external image with a seamless SVG noise pattern to prevent tiling artifacts/stripes */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
 }
 
 .hero-glow {

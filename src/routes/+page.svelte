@@ -97,7 +97,7 @@
         <div 
           in:fade={{ duration: 800, easing: cubicInOut }}
           out:fade={{ duration: 800, easing: cubicInOut }}
-          class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-all duration-500 transform hover:scale-105 hover:opacity-30"
+          class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-[transform,opacity] duration-500 transform-gpu hover:scale-105 hover:opacity-30 will-change-transform"
         >
           <img src={prevBook?.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Previous" class="w-full h-full object-cover rounded-sm shadow-2xl" />
         </div>
@@ -221,7 +221,7 @@
         <div 
           in:fade={{ duration: 800, easing: cubicInOut }}
           out:fade={{ duration: 800, easing: cubicInOut }}
-          class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-all duration-500 transform hover:scale-105 hover:opacity-30"
+          class="absolute inset-0 w-full h-full opacity-20 grayscale blur-[2px] transition-[transform,opacity] duration-500 transform-gpu hover:scale-105 hover:opacity-30 will-change-transform"
         >
           <img src={nextBook?.coverUrl || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=400&auto=format&fit=crop'} alt="Next" class="w-full h-full object-cover rounded-sm shadow-2xl" />
         </div>
