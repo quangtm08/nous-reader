@@ -58,7 +58,7 @@
     transform-style: preserve-3d;
     transform: rotateY(-22deg); /* Match animation end */
     transition: 1.6s cubic-bezier(0.23, 1, 0.32, 1);
-    animation: 1s ease 0s 1 initAnimation;
+    animation: 0.78s ease 0s 1 initAnimation;
   }
 
   .book-container:hover .book, 
