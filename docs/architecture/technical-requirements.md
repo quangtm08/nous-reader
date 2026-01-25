@@ -1,7 +1,6 @@
+# **Technical Requirements & Design**
 
-# **System Design Document: Nous**
-
-**Version:** 1.0 (Phase 1: The Foundation)
+**Version:** 1.1 (Phase 2: UI & Reader Engine)
 
 **Project Name:** Nous
 
@@ -39,55 +38,31 @@ Phase 1 focuses on building a "Steel Frame": a world-class EPUB reading environm
 
 ---
 
-## **4. Critical Dependencies**
+## **4. Data Architecture (AI-Ready Schema)**
 
-To handle EPUB files (which are specialized ZIP archives), the coding agent must implement the following:
+See [Database Guide](../guides/database.md) for full schema details.
 
-* **zip.js (BSD-3-Clause):** Used for navigating the internal structure of the EPUB archive.
-* **fflate (MIT):** Used as the high-speed decompression engine for zip.js.
-* **Reasoning:** These libraries are the standard "glue" for `foliate-js`. Do not attempt to replace them with native APIs unless specifically instructed, to ensure maximum compatibility with reflowable EPUB layouts.
+The database supports an **Adjacency List** model to allow for the future "Recursive Branching" of thoughts.
 
 ---
 
-## **5. Data Architecture (AI-Ready Schema)**
+## **5. Functional Requirements**
 
-The database must support an **Adjacency List** model to allow for the future "Recursive Branching" of thoughts.
+### **5.1 The Reader (Foliate Integration)**
 
-### **Core Schema Logic**
-
-1. **`books`**:
-* `id` (UUID), `title`, `author`, `local_path`, `cover_blob`, `metadata` (JSONB).
-
-
-2. **`annotations`**:
-* `id` (UUID) - The Anchor.
-* `book_id` (FK), `cfi_range` (String), `highlighted_text` (Text), `color`.
-
-
-3. **`threads`**:
-* `id` (UUID), `parent_id` (FK to self, Nullable).
-* `annotation_id` (FK), `content` (Markdown Text), `role` (User/System/Assistant).
-* `is_synthesis` (Boolean): Marks a node that summarizes its child branches.
-
-
-
----
-
-## **6. Phase 1: Functional Requirements**
-
-### **6.1 The Reader (Foliate Integration)**
-
-* Implement a contained `foliate-js` instance within the Tauri webview.
+* ✅ Implement a contained `foliate-js` instance within the Tauri webview.
+* ✅ **File Access:** Map local filesystem EPUBs into the app securely.
 * **CFI Stability:** Ensure highlights persist across font resizing or window scaling using Canonical Fragment Identifiers.
 * **IPC Bridge:** Establish a Tauri `emit/listen` protocol to pass selection data from the reader to the main UI.
 
-### **6.2 Library & Storage Management**
+### **5.2 Library & Storage Management**
 
-* **Local Import:** Map local filesystem EPUBs into the app.
+* ✅ **Local Import:** Import EPUBs from the local filesystem.
+* ✅ **Persistence:** Store book metadata in SQLite.
 * **Offline Persistence:** Every highlight and note must be written to the local SQLite database immediately.
 * **Cloud Sync:** Sync changes to Supabase when a connection is detected.
 
-### **6.3 The Recursive Sidebar**
+### **5.3 The Recursive Sidebar**
 
 * A right-pane UI that displays the "Thread" associated with a specific highlight.
 * **Visual Hierarchy:** Use indentation or Miller Column-style transitions to show parent/child relationships in notes.
@@ -95,16 +70,25 @@ The database must support an **Adjacency List** model to allow for the future "R
 
 ---
 
-## **7. Guardrails & Development Principles**
+## **6. Implementation Status**
 
-* **No Cloning:** Do not copy the proprietary UI/CSS of existing readers (e.g., Readest). All components must be original Svelte implementations.
-* **AI-Native Hook:** The `threads` table must treat "User" and "Assistant" roles as first-class citizens, even before the AI is integrated.
-* **Performance:** All library views must be virtualized to handle 500+ books without UI lag.
+### Completed
+- ✅ Tauri v2 project initialized with Svelte
+- ✅ `foliate-js` integration via `foliate-js/view.js` dynamic import
+- ✅ `zip.js` and `fflate` working (bundled with foliate-js)
+- ✅ Local EPUB file loading using `@tauri-apps/plugin-fs`
+- ✅ Content Security Policy configured for blob iframe loading
+- ✅ Navigation system (keyboard + buttons)
+- ✅ Fixed-layout EPUB support (cover scaling)
+- ✅ TypeScript declarations for foliate-js
+- ✅ Database Schema & Helpers (SQLite)
 
----
+### In Progress / Next Steps
+- 🚧 Selection event capture (text selection → annotation)
+- 🚧 CFI-based annotation persistence to SQLite
+- 🚧 Reading position (CFI) save/restore
+- 🚧 Recursive threading UI
 
-## **8. Immediate Coding Prompt for Agents**
-
-> "Initialize a Tauri v2 project with Svelte. Integrate `foliate-js` using `zip.js` and `fflate`. Create a command to load a local EPUB file and a listener that captures 'selection' events. When text is selected, save the `highlighted_text` and `cfi_range` into a local SQLite table named `annotations` using the `tauri-plugin-sql` plugin."
-
----
+### Not Started
+- ⏳ Cloud sync to Supabase
+- ⏳ AI-assisted conversation features

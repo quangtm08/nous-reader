@@ -1,6 +1,6 @@
 import { open } from '@tauri-apps/plugin-dialog';
 import { readFile } from '@tauri-apps/plugin-fs';
-import { insertBookRecord, type BookRecord } from './db';
+import { insertBookRecord, type BookRecord } from '../db';
 import { parseEpub } from './metadata';
 
 /**

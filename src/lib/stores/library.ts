@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import { fetchBooks, insertBookRecord, type BookRecord } from '../db';
-import { importBook as tauriImportBook } from '../library';
+import { importBook as tauriImportBook } from '../services/library';
 
 export interface UIBook extends BookRecord {
   coverUrl: string | null;

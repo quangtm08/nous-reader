@@ -1,86 +1,133 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { readFile } from '@tauri-apps/plugin-fs';
-  import { ArrowLeft } from 'lucide-svelte';
+  import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-svelte';
   import type { PageData } from './$types';
 
-  // We need to import the view module to register the custom element.
-  // Trying standard import path. If this fails, we might need to adjust based on the package structure.
-  // Note: The npm package for foliate-js might not export 'view.js' directly.
-  // If this causes issues, we will need to investigate the node_modules structure or use the classes directly.
-  // For now, assuming we can access it or we need to roll our own simple renderer using the library.
-  
-  // Attempting to import the custom element definition if available
-  // import 'foliate-js/view.js'; 
-  
-  // Since we are uncertain about the export, let's try a dynamic import in onMount or just rely on the fact 
-  // that we might need to instantiate the view manually if the custom element isn't registered.
-  
+  type FoliateModule = typeof import('foliate-js/view.js');
+  type FoliateView = import('foliate-js/view.js').View;
+
   let { data }: { data: PageData } = $props();
 
   let container: HTMLElement;
-  let view: any; // Type as any for now since we don't have types for foliate-js
+  let view: FoliateView | null = $state(null);
+  let error: string | null = $state(null);
+  let isLoading = $state(true);
 
-  onMount(async () => {
-    try {
-      // Dynamic import to handle potential path issues gracefully during dev
-      // In a real scenario, we'd want a static import.
-      // Checking if we can import the view. 
-      // If the npm package is just the core, we might need to implement a basic viewer using the 'Book' class.
-      const foliate = await import('foliate-js');
-      
-      // Load the file
-      const fileData = await readFile(data.book.local_path);
-      
-      // Initialize the book
-      // @ts-ignore - foliate types are missing
-      const book = await foliate.makeBook(new Blob([fileData]));
-      
-      // Create a render target
-      // If we don't have the <foliate-view> custom element, we might need to use the renderer directly.
-      // Let's try to use the 'render' method if available or 'makeReader'
-      
-      // NOTE: foliate-js documentation (what exists of it) implies using the custom element or the View class.
-      // Let's assume for a moment we can use the low-level rendering if the custom element isn't there.
-      
-      // However, the cleanest way if the custom element isn't available is to construct the View.
-      // Let's look for a View class in the exports.
-      
-      // For this first pass, I'll log the exports to the console to help debug in the browser
-      console.log('Foliate exports:', foliate);
+  function goPrev() {
+    // Prefer goLeft/goRight for RTL books when available.
+    // @ts-expect-error foliate-js types are partial.
+    return view?.goLeft?.() ?? view?.prev();
+  }
 
-      // Basic render attempt:
-      // If foliate.View exists:
-      if (foliate.View) {
-          view = new foliate.View(book);
-          container.appendChild(view.element);
-      } else {
-          // Fallback: Just display a message that we loaded the book but need to figure out rendering
-          // or try to render a section.
-          const section = book.sections[0];
-          if (section) {
-              const content = await section.load();
-              // This is raw text/html, might be messy without styles
-              // container.innerHTML = content;
-          }
-      }
+  function goNext() {
+    // @ts-expect-error foliate-js types are partial.
+    return view?.goRight?.() ?? view?.next();
+  }
 
-    } catch (e) {
-      console.error('Error initializing reader:', e);
+  function shouldHandleKeydown(e: KeyboardEvent) {
+    if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return false;
+    const target = e.target as HTMLElement | null;
+    if (!target) return true;
+    // Avoid hijacking typing in inputs/textareas.
+    if (target.closest('input, textarea, [contenteditable="true"]')) return false;
+    return true;
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (!view || !shouldHandleKeydown(e)) return;
+
+    switch (e.key) {
+      case 'ArrowLeft':
+      case 'PageUp':
+        e.preventDefault();
+        void goPrev();
+        break;
+      case 'ArrowRight':
+      case 'PageDown':
+      case ' ':
+        e.preventDefault();
+        void goNext();
+        break;
+      case 'Home':
+        e.preventDefault();
+        void view.goTo(0);
+        break;
     }
+  }
+
+  async function initReader() {
+    const foliate: FoliateModule = await import('foliate-js/view.js');
+
+    const fileData = await readFile(data.book.local_path);
+    const filename = data.book.local_path.split(/[\\/]/).pop() || 'book.epub';
+    const file = new File([fileData], filename);
+
+    const book = await foliate.makeBook(file);
+
+    const nextView = new foliate.View();
+    container.appendChild(nextView);
+
+    await nextView.open(book);
+
+    // CRITICAL: foliate-js requires `init()` to navigate and render.
+    // `showTextStart` attempts to skip cover/frontmatter when possible.
+    try {
+      await nextView.init({ showTextStart: true });
+    } catch {
+      await nextView.init({ showTextStart: false });
+    }
+
+    // Improve fixed-layout (cover-heavy) rendering: keep aspect ratio and fit page.
+    // `foliate-fxl` supports a `zoom` attribute.
+    // @ts-expect-error foliate-js types are partial.
+    if (nextView.isFixedLayout && nextView.renderer) {
+      nextView.renderer.setAttribute('zoom', 'fit-page');
+    }
+
+    // Prefer focusing the internal view for keyboard navigation.
+    // `foliate-paginator` exposes `focusView()`.
+    // @ts-expect-error foliate-js types are partial.
+    queueMicrotask(() => nextView.renderer?.focusView?.());
+
+    view = nextView;
+  }
+
+  onMount(() => {
+    const controller = new AbortController();
+
+    window.addEventListener('keydown', handleKeydown, {
+      signal: controller.signal
+    });
+
+    (async () => {
+      try {
+        await initReader();
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        console.error('Error initializing reader:', e);
+        error = `Error opening book: ${message}`;
+      } finally {
+        isLoading = false;
+      }
+    })();
+
+    return () => controller.abort();
   });
 
   onDestroy(() => {
-    if (view && view.destroy) {
-      view.destroy();
+    try {
+      view?.close();
+    } finally {
+      view = null;
     }
   });
 </script>
 
 <div class="w-screen h-screen bg-[#1a1a1a] text-ivory flex flex-col overflow-hidden">
   <!-- Toolbar -->
-  <header class="h-14 border-b border-white/10 flex items-center px-4 gap-4 bg-[#211311]">
+  <header class="h-12 border-b border-white/10 flex items-center px-4 gap-4 bg-[#211311] shrink-0">
     <button 
       onclick={() => goto('/')}
       class="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -92,15 +139,88 @@
   </header>
 
   <!-- Reader Container -->
-  <main class="flex-1 relative overflow-hidden" bind:this={container}>
+  <main class="flex-1 relative min-h-0" bind:this={container}>
+    {#if isLoading}
+      <div class="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
+        <div class="animate-pulse text-gold/60">Loading book...</div>
+      </div>
+    {/if}
+    
+    {#if error}
+      <div class="absolute inset-0 flex items-center justify-center p-8 text-center text-red-400 bg-black/50 z-10">
+        <div class="bg-[#211311] p-6 rounded-lg border border-red-900/50 shadow-xl max-w-md">
+          <h2 class="text-xl font-serif mb-2 text-red-300">Could not open book</h2>
+          <p class="text-sm opacity-80">{error}</p>
+        </div>
+      </div>
+    {/if}
     <!-- Foliate View will be injected here -->
+    
+    <!-- Navigation buttons (visible on hover) -->
+    <button 
+      onclick={goPrev}
+      class="nav-button left-2"
+      title="Previous page (←)"
+      type="button"
+    >
+      <ChevronLeft size={32} />
+    </button>
+    <button 
+      onclick={goNext}
+      class="nav-button right-2"
+      title="Next page (→)"
+      type="button"
+    >
+      <ChevronRight size={32} />
+    </button>
   </main>
 </div>
 
 <style>
-  /* Ensure the container allows the reader to fill it */
-  main {
+  /* Foliate view custom element needs explicit sizing */
+  :global(foliate-view) {
+    display: block;
     width: 100%;
     height: 100%;
+    background-color: #faf9f6;
+  }
+
+  /* Ensure the renderer fills available space */
+  :global(foliate-paginator),
+  :global(foliate-fxl) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Navigation buttons */
+  .nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    padding: 1rem 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .nav-button:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  main:hover .nav-button {
+    opacity: 1;
+  }
+
+  /* Also show on focus for accessibility */
+  .nav-button:focus {
+    opacity: 1;
+    outline: 2px solid rgba(212, 180, 131, 0.5);
+    outline-offset: 2px;
   }
 </style>

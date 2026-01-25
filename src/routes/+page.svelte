@@ -75,7 +75,7 @@
 
 <div class="min-h-screen flex flex-col p-8 md:p-12 max-w-[1600px] mx-auto relative">
   <!-- Header -->
-  <header class="flex justify-between items-start mb-8 md:mb-16 z-30 relative">
+  <header class="flex justify-between items-start mb-4 md:mb-12 z-30 relative">
     <button 
       onclick={() => isSidebarOpen.set(true)}
       class="size-12 flex items-center justify-center rounded-full text-ivory hover:bg-white/10 transition-colors duration-300 drop-shadow-md cursor-pointer"
@@ -83,7 +83,7 @@
       <Menu size={28} strokeWidth={1.5} />
     </button>
     
-    <div class="text-center absolute left-1/2 -translate-x-1/2 top-20 md:top-28 w-full pointer-events-none">
+    <div class="text-center absolute left-1/2 -translate-x-1/2 top-16 md:top-24 w-full pointer-events-none">
       <h1 class="text-3xl md:text-5xl font-serif font-light text-ivory/90 mb-4 tracking-wide drop-shadow-sm pointer-events-auto">
         {welcomeMessage}
       </h1>
@@ -110,7 +110,7 @@
   </header>
 
   <!-- Hero Section (Book Slider) -->
-  <section class="flex-1 relative flex items-center justify-center gap-12 md:gap-20 py-4 pt-20">
+  <section class="flex-1 relative flex items-center justify-center gap-12 md:gap-20 py-4 pt-12">
     {#if featuredBook}
     <!-- Left Navigation -->
     <button onclick={prev} class="hidden md:flex absolute left-0 z-30 size-12 items-center justify-center rounded-full bg-black/10 hover:bg-black/30 backdrop-blur-md text-ivory/60 hover:text-ivory transition-all border border-white/5 shadow-lg cursor-pointer">

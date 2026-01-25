@@ -64,9 +64,113 @@ Currently, the application allows importing books into the database and displayi
 - **Performance:** Loading large EPUBs into memory (ArrayBuffer) might be heavy.
 - **State:** We are not yet saving progress (CFI) in this iteration. That is a future task.
 
-## 5. Verification
+## 5. Implementation Results & Key Fixes
+
+### Issues Resolved During Implementation
+
+#### 5.1. Core Initialization Issue - Missing `view.init()`
+- **Problem:** Reader created but no content displayed because `view.init()` was never called after `view.open()`
+- **Root Cause:** `foliate-js` requires both `open(book)` to set up the renderer AND `init()` to navigate to and display content
+- **Solution:** Added `await view.init({ lastLocation: null, showTextStart: true })` after `view.open(book)`
+
+#### 5.2. Content Security Policy Blocking 
+- **Problem:** `Refused to load blob:http://... because it appears in neither the frame-src directive nor the default-src directive`
+- **Root Cause:** Foliate-js loads book content in iframes using blob URLs, but CSP blocked `frame-src`
+- **Solution:** Updated CSP in `src/app.html`:
+  ```html
+  <meta http-equiv="Content-Security-Policy" content="... frame-src 'self' blob:; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' blob:;">
+  ```
+
+#### 5.3. File Format Detection
+- **Problem:** `TypeError: undefined is not an object (evaluating 'name.endsWith')`
+- **Root Cause:** `foliate.makeBook()` expects a `File` object with `name` property, not `Blob`
+- **Solution:** Pass `new File([fileData], filename)` instead of raw fileData
+
+#### 5.4. Reader Interface & Navigation
+- **Added keyboard navigation:** Arrow keys, PageUp/Down, Spacebar for page turning
+- **Added visual navigation buttons:** Hover-activated prev/next buttons with chevron icons
+- **Added loading states:** Visual feedback while book loads
+- **Proper cleanup:** Event listeners and view cleanup in `onDestroy()`
+
+#### 5.5. Styling & Visibility
+- **Background color:** Set light background (#faf9f6) for contrast against black text
+- **Responsive layout:** Fixed toolbar height and container sizing with `min-h-0`
+- **Focus management:** Attempted to focus view for keyboard events
+
+### Current Status
+- **Working:** Book content loads and displays, CSP issues resolved, file access working
+- **Partial:** Navigation buttons and keyboard shortcuts implemented, navigation quality depends on book structure
+- **Open Issues:** Some books may show cover pages initially; `showTextStart` behavior varies by book structure
+
+## 6. Verification
 - [x] Click a book in the library.
 - [x] Application navigates to the new route.
-- [x] EPUB content renders correctly (text, images).
-- [x] Can turn pages.
+- [x] EPUB content loads and displays (text, images visible).
+- [x] Basic pagination works via keyboard and buttons.
 - [x] Can return to the home screen.
+- [x] Content Security Policy allows blob iframe loading.
+- [x] File permissions allow reading from local filesystem.
+
+## 7. Code Architecture & Best Practices
+
+### Reader Lifecycle (Critical Pattern)
+```typescript
+// 1. Load file with proper typing
+const file = new File([fileData], filename);
+
+// 2. Create book and view
+const book = await foliate.makeBook(file);
+const view = new foliate.View();
+container.appendChild(view);
+
+// 3. Open book
+await view.open(book);
+
+// 4. CRITICAL: Initialize and navigate to content
+await view.init({ showTextStart: true });
+
+// 5. For fixed-layout EPUBs, set zoom mode
+if (view.isFixedLayout && view.renderer) {
+  view.renderer.setAttribute('zoom', 'fit-page');
+}
+```
+
+### Event Listener Cleanup
+```typescript
+const controller = new AbortController();
+window.addEventListener('keydown', handler, { signal: controller.signal });
+// use return () => controller.abort() in onMount cleanup
+```
+
+### Keyboard Input Safety
+```typescript
+function shouldHandleKeydown(e: KeyboardEvent) {
+  if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return false;
+  const target = e.target as HTMLElement | null;
+  if (!target) return true;
+  // Avoid hijacking typing in inputs
+  if (target.closest('input, textarea, [contenteditable="true"]')) return false;
+  return true;
+}
+```
+
+### Navigation for RTL/LTR Books
+```typescript
+function goPrev() {
+  // Prefer goLeft/goRight for RTL
+  return view?.goLeft?.() ?? view?.prev();
+}
+
+function goNext() {
+  return view?.goRight?.() ?? view?.next();
+}
+```
+
+## 8. Future Enhancements
+- Save and restore reading position (CFI)
+- Chapter/TOC navigation
+- Settings for font size, line height, themes
+- Reading progress tracking
+- Search functionality
+- Selection capture and annotations
+- Highlighting colors
