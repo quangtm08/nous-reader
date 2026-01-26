@@ -2,6 +2,7 @@
   import { Library, BookOpen, Settings, Search, PlusCircle, X } from 'lucide-svelte';
   import { isSidebarOpen } from '$lib/stores/ui';
   import { libraryStore } from '$lib/stores/library';
+  import { page } from '$app/stores';
   
   function close() {
     isSidebarOpen.set(false);
@@ -40,17 +41,25 @@
   </div>
 
   <nav class="flex-1 px-4 space-y-2">
-    <a href="/" onclick={close} class="flex items-center space-x-3 p-3 rounded-xl bg-white/10 text-white group transition-all">
-      <Library size={20} class="text-accent" />
+    <a 
+      href="/" 
+      onclick={close} 
+      class="flex items-center space-x-3 p-3 rounded-xl transition-all group {$page.url.pathname === '/' ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}"
+    >
+      <BookOpen size={20} class={$page.url.pathname === '/' ? 'text-accent' : ''} />
+      <span class="font-medium">Current Reads</span>
+    </a>
+    <a 
+      href="/library" 
+      onclick={close} 
+      class="flex items-center space-x-3 p-3 rounded-xl transition-all group {$page.url.pathname === '/library' ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}"
+    >
+      <Library size={20} class={$page.url.pathname === '/library' ? 'text-accent' : ''} />
       <span class="font-medium">Library</span>
     </a>
     <button class="w-full flex items-center space-x-3 p-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white group transition-all cursor-pointer">
       <Search size={20} />
       <span class="font-medium">Browse</span>
-    </button>
-    <button class="w-full flex items-center space-x-3 p-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white group transition-all cursor-pointer">
-      <BookOpen size={20} />
-      <span class="font-medium">Current Reads</span>
     </button>
   </nav>
 

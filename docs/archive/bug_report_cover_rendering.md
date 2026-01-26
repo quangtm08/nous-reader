@@ -62,4 +62,4 @@ To properly fix the 3D book cover rendering (when we return to it):
 - `src/lib/stores/library.ts` (Blob handling - RESOLVED)
 - `src/lib/components/Book3D.svelte` (3D component - DEFERRED)
 - `src/routes/+page.svelte` (Now uses 2D `<img>` for center book)
-- `src/lib/components/HeroScene.svelte` (3D scene - NOT CURRENTLY USED)
+- `src/lib/components/HeroScene.svelte` (REMOVED - previously 3D scene)

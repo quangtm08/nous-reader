@@ -6,18 +6,20 @@
 - [x] Project scaffolding (Tauri v2 + Svelte 5)
 - [x] SQLite Database integration and schema design
 - [x] File System permissions and Dialog setup
-- [x] Basic Library logic: Importing and DB storage
-- [x] **Connect DB to UI**: Home screen now reads from real database (with MOCK fallback)
+- [x] **Optimized Library Logic**: Rust-based EPUB parsing and metadata extraction.
+- [x] **High-Performance Assets**: File-based cover storage with `asset:` protocol.
+- [x] **Migration Tooling**: Background migration of legacy blobs to optimized WebP files.
 
 ### Phase 2: UI Shell & Design System 🏗️ (IN PROGRESS)
 - [x] **Sanctuary (Home)**: High-fidelity CSS-based 3D Carousel with realistic textures, organic floating animations, and keyboard navigation. (DONE)
 - [x] **Desktop Layout**: Implemented Sidebar and Main Content structure with unified background layer system. (DONE)
-- [ ] **Global Styling**: Refine design tokens and typography (currently using Francisco Serial).
-- [ ] **Polished Library**: High-quality Book Cards for the "All Books" view (currently focusing on Sanctuary).
+- [ ] **Global Styling**: Refine design tokens and typography.
+- [x] **Polished Library**: High-quality static Book Cards for the "All Books" view with dense grid layout. (DONE)
 - [ ] **Component Library**: Create reusable buttons, inputs, and icons.
+- [ ] **Code Review**: Review the implementation of the Library page and Book3D component refinements (dynamic sizing, static mode, CSS variable integration).
 
 ### Phase 3: The Reading Experience
-- [x] **Metadata Extraction**: Robust EPUB parsing (Title, Author, Cover) using `zip.js` and `DOMParser`. (DONE)
+- [x] **Metadata Extraction**: Robust Rust-based parsing (Title, Author, Cover). (DONE)
 - [x] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs (DONE)
 - [x] **Book Viewer Route**: Create a dynamic route (`/book/[id]`) to open and read specific books. (DONE)
 
@@ -36,20 +38,17 @@
 ## 🛠️ Codebase Status
 
 ### System Architecture
-- **Frontend**: Svelte 5 (using Runes like `$state`, `$derived`)
+- **Frontend**: Svelte 5 (Runes: `$state`, `$derived`, `$effect`)
 - **Backend**: Tauri v2 (Rust)
 - **Database**: SQLite (via `tauri-plugin-sql`)
-- **Storage**: Local-first; files remain on user's disk, metadata in SQLite
+- **Storage**: Hybrid; metadata in SQLite, optimized assets in app data folder.
 
 ### Important Files
-- `src/lib/db.ts`: Database singleton and schema definitions.
-- `src/lib/library.ts`: Logic for importing and retrieving books.
-- `src/lib/metadata.ts`: EPUB parser (Title, Author, Cover Extraction).
-- `src/lib/stores/library.ts`: Reactive store for managing book state.
-- `src/routes/+page.svelte`: Main library dashboard (Sanctuary).
-- `src/lib/components/Book3D.svelte`: 3D book model with spring animations.
-- `src-tauri/capabilities/default.json`: Security permissions for the app.
+- `src-tauri/src/lib.rs`: Rust commands for EPUB import and image processing.
+- `src/lib/db.ts`: Database schema, migrations, and query helpers.
+- `src/lib/services/library.ts`: Library management and background migrations.
+- `src/lib/stores/library.ts`: Svelte store for reactive library state.
+- `src/lib/components/Book3D.svelte`: Pure CSS 3D book model.
 
 ### Known Issues / Technical Debt
-- [ ] **Regex fix**: Path splitting in `library.ts` is basic; might need more robust handling for varied OS paths.
-- [ ] **Performance**: 3D Texture swapping is optimized, but large libraries might need virtualization in the future.
+- [ ] **Virtualization**: As the library exceeds 100 books, the 3D carousel may require virtualization to maintain 60fps.

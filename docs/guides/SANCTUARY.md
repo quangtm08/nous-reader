@@ -22,7 +22,7 @@ The core interaction area.
     *   **Wrapping**: The Title and Progress sections are constrained (`w-0 min-w-full`) to wrap perfectly at the edge of the action row.
     *   **Alignment**: The entire grid has right-padding (`pr-20`) to optically center the active content relative to the side previews.
 *   **3D Book**:
-    *   Uses `@threlte/core`.
+    
     *   **Dimensions**: `w-[320px] h-[32rem]` (Desktop).
     *   **Interaction**: Floats on idle (sine wave), rotates on hover, "breathes" (soft scale) on texture swap.
     *   **Glow**: A `hero-glow` div behind the book (`bg-accent/20`, `blur-[100px]`, `mix-blend-screen`).

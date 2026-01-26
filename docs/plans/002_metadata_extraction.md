@@ -1,6 +1,11 @@
-# Execution Plan: EPUB Metadata Extraction (COMPLETED)
+# Execution Plan: EPUB Metadata Extraction (SUPERSEDED)
 
-**Status:** ✅ Completed on 2026-01-25
+> [!WARNING]
+> **This document is for historical reference only.**
+> The implementation described below (using JS-based `zip.js`) has been **superseded** by a high-performance Rust implementation using the `epub` and `image` crates. 
+> Refer to [Performance Optimization Strategy](./performance_optimization_strategy.md) for the current architecture.
+
+**Status:** ⏩ Superseded by Rust implementation
 **Goal:** Implement real parsing of EPUB files during import to extract the **Title**, **Author**, and **Cover Image**. This replaces the current filename-based fallback and provides a rich UI experience.
 
 ## 1. Prerequisites & Dependencies

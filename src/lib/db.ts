@@ -7,11 +7,15 @@ export interface BookRecord {
   title: string;
   author: string | null;
   local_path: string;
-  /** 
+  /**
    * BLOB from SQLite - tauri-plugin-sql returns this as number[] (byte array).
-   * Use blobToUint8Array() in stores/library.ts to safely convert.
+   * DEPRECATED: Use cover_path instead.
    */
   cover_blob: number[] | null;
+  /**
+   * Path to the cover image relative to the app data directory or an absolute path.
+   */
+  cover_path: string | null;
   metadata: string | null;
   created_at: string;
 }
@@ -22,8 +26,11 @@ export interface BookInsert {
   author?: string | null;
   local_path: string;
   cover_blob?: number[] | null;
+  cover_path?: string | null;
   metadata?: string | null;
 }
+
+// ... (AnnotationRecord, AnnotationInsert, ThreadRecord, ThreadInsert remain the same) ...
 
 export interface AnnotationRecord {
   id: string;
@@ -66,8 +73,6 @@ type Migration = {
   statements: string[];
 };
 
-const SCHEMA_VERSION = 1;
-
 const MIGRATIONS: Migration[] = [
   {
     version: 1,
@@ -108,10 +113,17 @@ const MIGRATIONS: Migration[] = [
       `CREATE INDEX IF NOT EXISTS idx_annotations_book ON annotations(book_id);`,
       `CREATE INDEX IF NOT EXISTS idx_threads_annotation ON threads(annotation_id);`
     ]
+  },
+  {
+    version: 2,
+    description: 'Add cover_path to books',
+    statements: [
+      `ALTER TABLE books ADD COLUMN cover_path TEXT;`
+    ]
   }
 ];
 
-// ... (rest of file)
+// ... (dbInstance, getDb, applyMigrations remain the same) ...
 
 let dbInstance: SQLiteDatabase | null = null;
 let initPromise: Promise<SQLiteDatabase> | null = null;
@@ -200,18 +212,20 @@ export async function insertBookRecord(input: BookInsert): Promise<BookRecord> {
     author: input.author?.trim() ?? null,
     local_path: input.local_path,
     cover_blob: input.cover_blob ?? null,
+    cover_path: input.cover_path ?? null,
     metadata: input.metadata ?? null
   };
 
   await db.execute(
-    `INSERT INTO books (id, title, author, local_path, cover_blob, metadata)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO books (id, title, author, local_path, cover_blob, cover_path, metadata)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [
       payload.id,
       payload.title,
       payload.author,
       payload.local_path,
       payload.cover_blob,
+      payload.cover_path,
       payload.metadata
     ]
   );
@@ -298,4 +312,18 @@ export async function fetchThreadsForAnnotation(annotationId: string): Promise<T
 export async function deleteBook(id: string): Promise<void> {
   const db = await getDb();
   await db.execute(`DELETE FROM books WHERE id = ?`, [id]);
+}
+
+export async function updateBookCover(id: string, coverPath: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(
+    `UPDATE books SET cover_path = ?, cover_blob = NULL WHERE id = ?`,
+    [coverPath, id]
+  );
+}
+
+export async function clearLibrary(): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM books`);
+  // Note: cascades will handle annotations and threads
 }
