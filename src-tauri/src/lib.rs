@@ -16,7 +16,9 @@ pub struct BookRecord {
 #[tauri::command]
 async fn import_book(app: AppHandle, file_path: String) -> Result<BookRecord, String> {
     // 1. Open EPUB
-    let mut doc = EpubDoc::new(&file_path).map_err(|e| format!("Failed to open EPUB: {}", e))?;
+    println!("Attempting to open EPUB at: {}", file_path);
+    let mut doc = EpubDoc::new(&file_path)
+        .map_err(|e| format!("Failed to open EPUB: {}", e))?;
 
     // 2. Extract Metadata
     // doc.mdata(key) returns Option<&MetadataItem>

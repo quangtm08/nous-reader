@@ -30,8 +30,6 @@ export interface BookInsert {
   metadata?: string | null;
 }
 
-// ... (AnnotationRecord, AnnotationInsert, ThreadRecord, ThreadInsert remain the same) ...
-
 export interface AnnotationRecord {
   id: string;
   book_id: string;
@@ -296,7 +294,7 @@ export async function insertThreadRecord(input: ThreadInsert): Promise<ThreadRec
 export async function fetchAnnotationsForBook(bookId: string): Promise<AnnotationRecord[]> {
   const db = await getDb();
   return db.select<AnnotationRecord[]>(
-    `SELECT * FROM annotations WHERE book_id = ? ORDER BY rowid ASC`,
+    `SELECT * FROM annotations WHERE book_id = ? ORDER BY cfi_range ASC`,
     [bookId]
   );
 }

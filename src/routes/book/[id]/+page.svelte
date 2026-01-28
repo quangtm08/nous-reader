@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { readFile } from '@tauri-apps/plugin-fs';
   import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-svelte';
+  import { fetchAnnotationsForBook, insertAnnotationRecord } from '$lib/db';
   import type { PageData } from './$types';
 
   type FoliateModule = typeof import('foliate-js/view.js');
@@ -15,6 +16,9 @@
   let view: FoliateView | null = $state(null);
   let error: string | null = $state(null);
   let isLoading = $state(true);
+
+  // Selection UI state
+  let selectionMenu = $state<{ x: number, y: number, cfi: string, text: string } | null>(null);
 
   // UI State
   let showToolbar = $state(false);
@@ -46,12 +50,10 @@
   }
 
   function goPrev() {
-    // @ts-expect-error foliate-js types are partial.
     return view?.goLeft?.() ?? view?.prev();
   }
 
   function goNext() {
-    // @ts-expect-error foliate-js types are partial.
     return view?.goRight?.() ?? view?.next();
   }
 
@@ -101,15 +103,22 @@
       await nextView.init({ showTextStart: false });
     }
 
-    // @ts-expect-error foliate-js types are partial.
-    if (nextView.isFixedLayout && nextView.renderer) {
+    // Load annotations
+    const annotations = await fetchAnnotationsForBook(data.book.id);
+    for (const ann of annotations) {
+      nextView.addAnnotation({
+        value: ann.cfi_range,
+        color: ann.color || 'var(--color-accent)'
+      });
+    }
+
+    if (nextView.isFixedLayout && nextView.renderer?.setAttribute) {
       nextView.renderer.setAttribute('zoom', 'fit-page');
     }
 
     // Restore focus to container on every navigation event (relocate)
-    // This fixes the issue where clicking internal links (TOC) traps focus inside the iframe/shadow-dom
     nextView.addEventListener('relocate', () => {
-      // Small timeout to allow the transition to complete/settle
+      selectionMenu = null;
       setTimeout(() => {
         if (document.activeElement !== container) {
           container?.focus();
@@ -117,9 +126,49 @@
       }, 10);
     });
 
-    // @ts-expect-error foliate-js types are partial.
+    // Handle text selection
+    nextView.addEventListener('mouseup', (e) => {
+      const selection = nextView.getSelection();
+      if (selection && selection.text) {
+        selectionMenu = {
+          x: e.clientX,
+          y: e.clientY - 40,
+          cfi: selection.value,
+          text: selection.text
+        };
+      } else {
+        selectionMenu = null;
+      }
+    });
+
     queueMicrotask(() => nextView.renderer?.focusView?.());
     view = nextView;
+  }
+
+  async function saveHighlight() {
+    if (!view || !selectionMenu) return;
+    if (!selectionMenu.text.trim()) {
+      selectionMenu = null;
+      return;
+    }
+
+    try {
+      const ann = await insertAnnotationRecord({
+        book_id: data.book.id,
+        cfi_range: selectionMenu.cfi,
+        highlighted_text: selectionMenu.text,
+        color: 'var(--color-accent)'
+      });
+
+      view.addAnnotation({
+        value: ann.cfi_range,
+        color: ann.color || 'var(--color-accent)'
+      });
+
+      selectionMenu = null;
+    } catch (e) {
+      console.error('Failed to save highlight:', e);
+    }
   }
 
   onMount(() => {
@@ -130,32 +179,31 @@
       signal: controller.signal
     });
 
-    (async () => {
-      try {
-        await initReader();
-      } catch (e) {
+    initReader()
+      .catch((e) => {
         const message = e instanceof Error ? e.message : String(e);
         console.error('Error initializing reader:', e);
         error = `Error opening book: ${message}`;
-      } finally {
+      })
+      .finally(() => {
         isLoading = false;
         setTimeout(() => container?.focus(), 100);
-      }
-    })();
+      });
 
     return () => {
       controller.abort();
       clearTimeout(leftTimeout);
       clearTimeout(rightTimeout);
+      if (view) {
+        try {
+          view.close();
+          view.remove(); // Remove from DOM
+        } catch (e) {
+          // View may already be destroyed during navigation
+        }
+        view = null;
+      }
     };
-  });
-
-  onDestroy(() => {
-    try {
-      view?.close();
-    } finally {
-      view = null;
-    }
   });
 </script>
 
@@ -236,7 +284,7 @@
       onclick={goNext}
       onmouseenter={handleRightEnter}
       onmouseleave={handleRightLeave}
-      class="absolute right-0 top-0 bottom-0 w-24 z-20 flex items-center justify-end pr-4 cursor-pointer outline-none bg-transparent border-none hover:bg-gradient-to-l from-black/5 to-transparent transition-all duration-300"
+      class="absolute right-0 top-0 bottom-0 w-24 z-20 flex items-center justify-end pr-4 cursor-pointer outline-none bg-transparent border-none hover:bg-gradient-l from-black/5 to-transparent transition-all duration-300"
       title="Next page (→)"
       type="button"
       aria-label="Next page"
@@ -251,6 +299,23 @@
         <ChevronRight size={48} strokeWidth={1} />
       </div>
     </button>
+
+    <!-- Selection Menu -->
+    {#if selectionMenu}
+      <div 
+        transition:fade={{ duration: 150 }}
+        class="absolute z-50 flex items-center gap-1 bg-[#211311] border border-white/10 rounded-full shadow-2xl p-1 backdrop-blur-xl"
+        style="left: {selectionMenu.x}px; top: {selectionMenu.y}px; transform: translateX(-50%);"
+      >
+        <button 
+          onclick={saveHighlight}
+          class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/10 text-ivory/90 transition-colors group cursor-pointer"
+        >
+          <div class="size-4 rounded-full bg-accent shadow-[0_0_8px_rgba(212,180,131,0.6)]"></div>
+          <span class="text-xs font-medium tracking-wide uppercase">Highlight</span>
+        </button>
+      </div>
+    {/if}
   </main>
 </div>
 
@@ -260,6 +325,15 @@
     width: 100%;
     height: 100%;
     background-color: #faf9f6;
+  }
+  /* Style the highlights added by foliate-js */
+  :global(.foliate-highlight) {
+    background-color: var(--color-accent) !important;
+    opacity: 0.3;
+    cursor: pointer;
+  }
+  :global(.foliate-highlight:hover) {
+    opacity: 0.5;
   }
   :global(foliate-paginator),
   :global(foliate-fxl) {

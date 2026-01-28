@@ -23,10 +23,15 @@
 - [x] **Reader Engine Integration**: Implement `foliate-js` to render EPUBs (DONE)
 - [x] **Book Viewer Route**: Create a dynamic route (`/book/[id]`) to open and read specific books. (DONE)
 
-### Phase 3: Annotations & Recursive Threads 🧪
-- [ ] **Highlighting**: Ability to select text and save CFI ranges
-- [ ] **Annotation Sidebar**: View all highlights for a book
-- [ ] **Recursive Threading**: Implement the logic to "reply" to highlights and notes
+## Current Focus: Phase 3b - Annotation Sidebar
+
+See [Plan 008: Annotation Sidebar](plans/008_annotation_sidebar.md) for implementation details.
+
+Phase 3 Complete (Core):
+- [x] **Highlighting**: Ability to select text and save CFI ranges
+- [x] **CFI Persistence**: Save annotations to SQLite database
+- [ ] **Annotation Sidebar**: View all highlights for a book (NEXT)
+- [ ] **Recursive Threading**: Implement the logic to "reply" to highlights
 - [ ] **Thread Visualization**: UI for nesting and navigating deep conversations
 
 ### Phase 4: Local Intelligence (Future) 🧠

@@ -66,8 +66,10 @@ The architecture emphasizes **Zero-JS-Overhead** for heavy I/O and binary tasks,
 - ✅ Background migration tool for legacy blob data
 - ✅ `foliate-js` integration and reader route
 - ✅ Pure CSS 3D "Sanctuary" carousel
+- ✅ Text Selection & Highlighting (CFI-based)
+- ✅ Annotation persistence to SQLite
 
 ### In Progress / Next Steps
-- 🚧 Selection event capture (text selection → annotation)
-- 🚧 CFI-based annotation persistence to SQLite
+- 🚧 Annotation Sidebar (List view of highlights)
 - 🚧 Recursive threading UI
+- 🚧 Selection event capture (text selection → annotation) (DONE)
