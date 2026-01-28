@@ -106,6 +106,17 @@
       nextView.renderer.setAttribute('zoom', 'fit-page');
     }
 
+    // Restore focus to container on every navigation event (relocate)
+    // This fixes the issue where clicking internal links (TOC) traps focus inside the iframe/shadow-dom
+    nextView.addEventListener('relocate', () => {
+      // Small timeout to allow the transition to complete/settle
+      setTimeout(() => {
+        if (document.activeElement !== container) {
+          container?.focus();
+        }
+      }, 10);
+    });
+
     // @ts-expect-error foliate-js types are partial.
     queueMicrotask(() => nextView.renderer?.focusView?.());
     view = nextView;

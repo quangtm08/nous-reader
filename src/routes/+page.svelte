@@ -83,7 +83,7 @@
       <Menu size={28} strokeWidth={1.5} />
     </button>
     
-    <div class="text-center absolute left-1/2 -translate-x-1/2 top-16 md:top-24 w-full pointer-events-none">
+    <div class="text-center absolute left-1/2 -translate-x-1/2 top-12 md:top-20 w-full pointer-events-none">
       <h1 class="text-3xl md:text-5xl font-serif font-light text-ivory/90 mb-4 tracking-wide drop-shadow-sm pointer-events-auto">
         {welcomeMessage}
       </h1>

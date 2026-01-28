@@ -10,16 +10,22 @@
 }
 
 :root {
+  /* Core Base Colors */
   --bg-primary: #171211;
   --text-primary: #FDFBF7;
+
+  /* Semantic Book Colors */
+  --color-book-page: #fdfbf7;
+  --color-book-spine-dark: #111111;
+  --color-book-cover-default: #01060f;
 }
 
 @theme {
   --font-serif: 'Francisco Serial', serif;
   --font-sans: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   
-  /* Colors from reference, but with user's preferred gold accent */
-  --color-primary: #e86854; /* Keeping reference primary for potential use, but accent overrides */
+  /* Palette */
+  --color-primary: #e86854;
   --color-background-light: #f8f6f6;
   --color-background-dark: #211311;
   --color-ivory: #FDFBF7;
@@ -27,10 +33,10 @@
   --color-terracotta: #e86854;
   --color-charcoal: #171211;
   
-  /* User's preferred accent (Gold) overriding reference's terracotta for main UI elements */
+  /* Semantic / Theme Colors */
   --color-accent: #d4b483; 
-  --color-background: #171211; /* Mapping charcoal to background */
-  --color-surface: #211311;    /* Mapping background-dark to surface */
+  --color-background: #171211;
+  --color-surface: #211311;
 }
 
 body {

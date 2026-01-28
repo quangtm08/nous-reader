@@ -13,10 +13,10 @@
 ### Phase 2: UI Shell & Design System 🏗️ (IN PROGRESS)
 - [x] **Sanctuary (Home)**: High-fidelity CSS-based 3D Carousel with realistic textures, organic floating animations, and keyboard navigation. (DONE)
 - [x] **Desktop Layout**: Implemented Sidebar and Main Content structure with unified background layer system. (DONE)
-- [ ] **Global Styling**: Refine design tokens and typography.
+- [x] **Global Styling**: Refine design tokens and typography.
 - [x] **Polished Library**: High-quality static Book Cards for the "All Books" view with dense grid layout. (DONE)
-- [ ] **Component Library**: Create reusable buttons, inputs, and icons.
-- [ ] **Code Review**: Review the implementation of the Library page and Book3D component refinements (dynamic sizing, static mode, CSS variable integration).
+- [x] **Component Library**: Create reusable buttons, inputs, and icons. (DONE)
+- [x] **Code Review**: Review the implementation of the Library page and Book3D component refinements (dynamic sizing, static mode, CSS variable integration).
 
 ### Phase 3: The Reading Experience
 - [x] **Metadata Extraction**: Robust Rust-based parsing (Title, Author, Cover). (DONE)

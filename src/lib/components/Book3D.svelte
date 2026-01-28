@@ -23,7 +23,7 @@
         {#if coverUrl}
           <img src={coverUrl} alt={title} class="w-full h-full object-cover" />
         {:else}
-          <div class="w-full h-full bg-[#01060f] flex items-center justify-center p-4 text-center font-serif text-ivory/50">
+          <div class="w-full h-full bg-book-cover-default flex items-center justify-center p-4 text-center font-serif text-ivory/50">
             {title}
           </div>
         {/if}
@@ -89,7 +89,7 @@
     position: absolute;
     inset: 0;
     transform: translateZ(var(--book-translate-z));
-    background-color: #01060f;
+    background-color: var(--color-book-cover-default);
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
     border-radius: 0 4px 4px 0;
     box-shadow: 5px 5px 20px rgba(0,0,0,0.5);
@@ -120,7 +120,7 @@
     width: var(--book-thickness);
     height: calc(100% - 8px);
     transform: translateX(calc(var(--book-width) - (var(--book-thickness) / 2))) rotateY(90deg);
-    background-color: #fdfbf7;
+    background-color: var(--color-book-page);
     background-image: 
       linear-gradient(90deg, rgba(0,0,0,0.25) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.1) 100%),
       repeating-linear-gradient(90deg, transparent 0px, transparent 12px, rgba(101, 67, 33, 0.15) 12px, rgba(101, 67, 33, 0.15) 13px);
@@ -132,7 +132,7 @@
     inset: 0;
     content: ' ';
     transform: translateZ(calc(var(--book-translate-z) * -1));
-    background-color: #01060f;
+    background-color: var(--color-book-cover-default);
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
     border-radius: 0 4px 4px 0;
     box-shadow: -10px 0 50px 10px rgba(0,0,0,0.5);
@@ -147,7 +147,7 @@
     width: var(--book-thickness);
     height: 100%;
     transform: translateX(calc(var(--book-thickness) / -2)) rotateY(-90deg);
-    background: #111;
+    background: var(--color-book-spine-dark);
     background-image: 
       url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E"),
       linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.4) 85%, rgba(255,255,255,0.05) 100%);

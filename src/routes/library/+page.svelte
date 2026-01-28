@@ -4,6 +4,7 @@
   import { isSidebarOpen } from '$lib/stores/ui';
   import { libraryStore } from '$lib/stores/library';
   import Book3D from '$lib/components/Book3D.svelte';
+  import Button from '$lib/components/ui/Button.svelte';
   import { goto } from '$app/navigation';
 
   let books = $derived($libraryStore.books);
@@ -21,28 +22,31 @@
   <!-- Header -->
   <header class="flex justify-between items-center mb-12 z-30 relative">
     <div class="flex items-center gap-6">
-      <button 
+      <Button 
+        variant="icon" 
+        size="icon"
         onclick={() => isSidebarOpen.set(true)}
-        class="size-12 flex items-center justify-center rounded-full text-ivory hover:bg-white/10 transition-colors duration-300 drop-shadow-md cursor-pointer"
       >
         <Menu size={28} strokeWidth={1.5} />
-      </button>
+      </Button>
       <h1 class="text-3xl font-serif font-light text-ivory/90 tracking-wide">
         Library
       </h1>
     </div>
 
     <div class="flex items-center gap-4">
-      <button 
+      <Button 
+        variant="primary" 
+        size="md"
         onclick={handleImport}
-        class="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-ivory/80 hover:bg-white/10 hover:text-ivory transition-all border border-white/5 cursor-pointer"
+        class="gap-2"
       >
         <Plus size={20} />
-        <span class="text-sm font-medium">Import</span>
-      </button>
-      <button class="size-12 flex items-center justify-center rounded-full text-ivory hover:bg-white/10 transition-colors duration-300 drop-shadow-md cursor-pointer">
+        <span>Import</span>
+      </Button>
+      <Button variant="icon" size="icon">
         <Search size={28} strokeWidth={1.5} />
-      </button>
+      </Button>
     </div>
   </header>
 
@@ -54,12 +58,13 @@
           <Plus size={48} strokeWidth={1} />
         </div>
         <p class="text-lg font-serif italic">Your library is empty</p>
-        <button 
+        <Button 
+          variant="ghost" 
           onclick={handleImport}
-          class="text-accent hover:text-accent/80 transition-colors text-sm font-medium tracking-widest uppercase"
+          class="text-accent hover:text-accent/80 tracking-widest uppercase text-xs"
         >
           Import your first book
-        </button>
+        </Button>
       </div>
     {:else}
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-x-1 gap-y-6">
@@ -94,7 +99,4 @@
 
 <style>
   /* We can add specific library styles here if needed */
-  :global(body) {
-    background-color: #0f0a0a;
-  }
 </style>
