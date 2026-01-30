@@ -1,0 +1,21 @@
+diff --git a/node_modules/foliate-js/paginator.js b/node_modules/foliate-js/paginator.js
+index 95c4d0d..856558f 100644
+--- a/node_modules/foliate-js/paginator.js
++++ b/node_modules/foliate-js/paginator.js
+@@ -286,7 +286,7 @@ class View {
+         const doc = this.document
+         setStylesImportant(doc.documentElement, {
+             'box-sizing': 'border-box',
+-            'padding': vertical ? `${margin*1.5}px ${gap}px` : `0 ${gap}px`,
++            'padding': vertical ? `${margin * 1.5}px ${gap}px` : `0 ${gap}px`,
+             'column-width': 'auto',
+             'height': 'auto',
+             'width': 'auto',
+@@ -352,6 +352,7 @@ class View {
+         }
+     }
+     expand() {
++        if (!this.document) return
+         const { documentElement } = this.document
+         if (this.#column) {
+             const side = this.#vertical ? 'height' : 'width'

@@ -9,7 +9,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",
-    "test": "vitest"
+    "test": "vitest",
+    "postinstall": "npx patch-package"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.6",
@@ -22,6 +23,7 @@
     "@testing-library/svelte": "^5.3.1",
     "autoprefixer": "^10.4.23",
     "jsdom": "^27.4.0",
+    "patch-package": "^8.0.1",
     "postcss": "^8.5.6",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",

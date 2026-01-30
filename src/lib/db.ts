@@ -325,3 +325,8 @@ export async function clearLibrary(): Promise<void> {
   await db.execute(`DELETE FROM books`);
   // Note: cascades will handle annotations and threads
 }
+
+export async function deleteAnnotation(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM annotations WHERE id = ?`, [id]);
+}
